@@ -57,10 +57,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("androidx.compose.material:material-icons-extended:1.6.1")
     // --- Room (local database) ---
     implementation("androidx.room:room-runtime:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // --- Retrofit (API calls) ---
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
