@@ -1,0 +1,66 @@
+# ---------------------------------
+# Gradle
+# ---------------------------------
+.gradle/
+build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Local configuration
+local.properties
+gradle.properties
+
+# Log files
+*.log
+
+# ---------------------------------
+# Android Studio / IntelliJ
+# ---------------------------------
+.idea/
+*.iml
+out/
+captures/
+
+# Compose preview cache
+*.preview.cache/
+compose-cache/
+
+# Navigation editor
+.navigation/
+
+# ---------------------------------
+# Keystore (never commit signing keys)
+# ---------------------------------
+*.keystore
+*.jks
+*.pem
+
+# ---------------------------------
+# OS Junk Files
+# ---------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux / temp
+*~
+
+# ---------------------------------
+# NDK
+# ---------------------------------
+.externalNativeBuild
+.cxx/
+
+# ---------------------------------
+# Misc
+# ---------------------------------
+.env
+secret.txt
+navigation.json
+*.hprof
