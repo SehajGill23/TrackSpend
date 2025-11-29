@@ -19,7 +19,10 @@ object DatabaseModule {
             context.applicationContext,
             AppDatabase::class.java,
             "TrackSpend.db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
+
     }
 
     fun provideDatabase(): AppDatabase = db

@@ -1,13 +1,6 @@
 package com.example.trackspend.data.tracking
+import com.example.trackspend.data.model.TrackingEvent
 
-/**
- * One update in a package's tracking history.
- */
-data class TrackingEvent(
-    val status: String,       // "In transit", "Delivered", etc.
-    val location: String? = null,
-    val timestamp: Long       // epoch millis
-)
 
 /**
  * Unified result returned after tracking ANY carrier.

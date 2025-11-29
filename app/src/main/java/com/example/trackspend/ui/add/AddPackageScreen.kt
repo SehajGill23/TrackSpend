@@ -22,6 +22,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.example.trackspend.data.local.DatabaseModule
 import com.example.trackspend.data.local.PackageEntity
+import java.time.LocalDate
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -94,7 +95,7 @@ fun AddPackageScreen(
     fun isValidDate(formatted: String): Boolean {
         return try {
             if (formatted.length != 10) return false
-            java.time.LocalDate.parse(formatted)
+            LocalDate.parse(formatted)
             true
         } catch (e: Exception) {
             false
@@ -291,7 +292,8 @@ fun AddPackageScreen(
                             orderDate = orderDateField.text.trim(),
                             eta = null,
                             status = "In Transit",
-                            lastUpdate = System.currentTimeMillis()
+                            lastUpdate = System.currentTimeMillis(),
+                            trackingHistoryJson = null
                         )
 
                         DatabaseModule.providePackageDao().insertPackage(entity)

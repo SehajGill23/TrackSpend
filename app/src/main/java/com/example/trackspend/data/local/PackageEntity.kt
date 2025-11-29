@@ -18,9 +18,9 @@ data class PackageEntity(
     val store: String?,
     val itemName: String?,
     val price: Double?,
-
     val orderDate: String?,
     val eta: String?,
     val status: String,
+    val trackingHistoryJson: String?,
     val lastUpdate: Long
 )

@@ -16,6 +16,9 @@ interface PackageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPackage(pkg: PackageEntity)
 
+    @Update
+    suspend fun updatePackage(pkg: PackageEntity)
+
     // Read all tracked packages, sorted by latest update
     @Query("SELECT * FROM packages ORDER BY lastUpdate DESC")
     fun getAllPackages(): Flow<List<PackageEntity>>
@@ -23,6 +26,9 @@ interface PackageDao {
     // Calculate total spending (nullable)
     @Query("SELECT SUM(price) FROM packages")
     fun getTotalSpending(): Flow<Double?>
+
+    @Query("SELECT * FROM packages WHERE id = :id")
+    fun getPackageById(id: Int): Flow<PackageEntity?>
 
     // Delete a package
     @Delete

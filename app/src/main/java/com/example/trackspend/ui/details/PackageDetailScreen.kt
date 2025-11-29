@@ -11,6 +11,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.trackspend.viewmodel.PackageViewModel
 import com.example.trackspend.data.local.PackageEntity
+import com.google.gson.Gson
+import com.example.trackspend.data.model.TrackingEvent
+import kotlinx.coroutines.flow.SharingStarted
+
+
 
 @Composable
 fun PackageDetailScreen(
@@ -18,14 +23,21 @@ fun PackageDetailScreen(
     viewModel: PackageViewModel,
     navController: NavController
 ) {
-    // Look for THIS package in the list
-    val packages by viewModel.allPackages.collectAsState()
-    val pkg = packages.find { it.id == id }
+    // FIXED – retrieve item through ViewModel instead of accessing DAO
+    val pkgFlow = viewModel.packageById(id)
+    val pkg by pkgFlow.collectAsState(initial = null)
+
+    // Auto-refresh tracking on screen open
+    LaunchedEffect(id) {
+        pkg?.let { viewModel.refreshTracking(it) }
+    }
 
     if (pkg == null) {
-        Text("Package not found", modifier = Modifier.padding(16.dp))
+        Text("Loading...", modifier = Modifier.padding(16.dp))
         return
     }
+
+    val item = pkg!!
 
     Column(
         modifier = Modifier
@@ -40,47 +52,15 @@ fun PackageDetailScreen(
             fontWeight = FontWeight.Bold
         )
 
-        // MAIN CARD
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                DetailRow("Tracking Number", pkg.trackingNumber)
-                DetailRow("Carrier", pkg.carrier)
-                DetailRow("Store", pkg.store ?: "N/A")
-                DetailRow("Item", pkg.itemName ?: "N/A")
-                DetailRow("Price", pkg.price?.let { "$$it" } ?: "N/A")
-                DetailRow("Order Date", pkg.orderDate?.toString() ?: "N/A")
-                DetailRow("Status", pkg.status)
-            }
-        }
+        MainInfoCard(item)
 
-        // TIMELINE PLACEHOLDER (YOU CAN STYLE LATER)
         Text(
             "Tracking Timeline",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Text("• Label Created")
-                Text("• In Transit")
-                Text("• Out for Delivery")
-                Text("• Delivered")
-            }
-        }
+        TrackingTimelineCard(item)
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -89,6 +69,60 @@ fun PackageDetailScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Back")
+        }
+    }
+}
+
+
+@Composable
+fun MainInfoCard(pkg: PackageEntity) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            DetailRow("Tracking Number", pkg.trackingNumber)
+            DetailRow("Carrier", pkg.carrier)
+            DetailRow("Store", pkg.store ?: "N/A")
+            DetailRow("Item", pkg.itemName ?: "N/A")
+            DetailRow("Price", pkg.price?.let { "$$it" } ?: "N/A")
+            DetailRow("Order Date", pkg.orderDate?.toString() ?: "N/A")
+            DetailRow("Status", pkg.status)
+        }
+    }
+}
+
+@Composable
+fun TrackingTimelineCard(pkg: PackageEntity) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            // Real timeline events
+            val events: List<TrackingEvent> =
+                remember(pkg.trackingHistoryJson) {
+                    if (pkg.trackingHistoryJson.isNullOrEmpty()) emptyList()
+                    else Gson().fromJson(
+                        pkg.trackingHistoryJson,
+                        Array<TrackingEvent>::class.java
+                    ).toList()
+                }
+
+            if (events.isEmpty()) {
+                Text("No tracking updates yet.")
+            } else {
+                events.forEach { event ->
+                    Text("• ${event.status} – ${event.location ?: ""}")
+                }
+            }
         }
     }
 }

@@ -99,7 +99,8 @@ fun AppNavHost(
                             orderDate = null,
                             eta = null,
                             status = "In Transit",
-                            lastUpdate = System.currentTimeMillis()
+                            lastUpdate = System.currentTimeMillis(),
+                            trackingHistoryJson = null,
                         )
                     )
                 }
