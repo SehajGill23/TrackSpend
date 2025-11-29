@@ -28,16 +28,35 @@
 # PHASE 2 — NAVIGATION SETUP
 # ===============================
 
-[ ] Add Navigation Compose dependency
-[ ] Create NavHost in MainActivity
-[ ] Define routes:
+[✔] Add Navigation Compose dependency
+[✔] Create NavHost in MainActivity
+[✔] Define routes:
     - home
     - add
     - analytics
     - details/{packageId}
 
+
 # ===============================
-# PHASE 3 — HOME SCREEN
+# PHASE 3 — ADD PACKAGE SCREEN
+# ===============================
+
+[✔] Create AddPackageScreen composable
+[✔] Add text fields:
+    - tracking number
+    - carrier
+    - store
+    - item name
+    - price
+    - order date
+[✔] Add "Paste Email" text area
+[✔] Implement email parsing (extract tracking, price, etc.)
+[✔] Auto-detect carrier from tracking number
+[] Add save button → insert into DB
+[✔] Navigate back to Home on save
+
+# ===============================
+# PHASE 4 — HOME SCREEN
 # ===============================
 
 [ ] Create HomeScreen composable
@@ -49,23 +68,6 @@
 [ ] Add delete option (swipe or long-press)
 [ ] Add pull-to-refresh
 
-# ===============================
-# PHASE 4 — ADD PACKAGE SCREEN
-# ===============================
-
-[ ] Create AddPackageScreen composable
-[ ] Add text fields:
-    - tracking number
-    - carrier
-    - store
-    - item name
-    - price
-    - order date
-[ ] Add "Paste Email" text area
-[ ] Implement email parsing (extract tracking, price, etc.)
-[ ] Auto-detect carrier from tracking number
-[ ] Add save button → insert into DB
-[ ] Navigate back to Home on save
 
 # ===============================
 # PHASE 5 — ANALYTICS SCREEN

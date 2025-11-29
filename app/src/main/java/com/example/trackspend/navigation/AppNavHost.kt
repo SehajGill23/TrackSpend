@@ -1,16 +1,20 @@
 package com.example.trackspend.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.compose.ui.Modifier
+import com.example.trackspend.ui.add.AddPackageScreen
 
 /**
  * AppNavHost defines ALL navigation routes for your app.
  *
  * Each composable() is one screen.
  */
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(navController: NavHostController,
                modifier: Modifier = Modifier) {
@@ -26,7 +30,13 @@ fun AppNavHost(navController: NavHostController,
 
         // Add-package screen
         composable(Routes.ADD) {
-            PlaceholderScreen("Add Package Screen")
+            AddPackageScreen(
+                navController = navController,
+                modifier = modifier,
+                onSave = { tracking, carrier, store, itemName, price, date ->
+                    // TODO: save to DB using ViewModel
+                }
+            )
         }
 
         // Analytics screen
