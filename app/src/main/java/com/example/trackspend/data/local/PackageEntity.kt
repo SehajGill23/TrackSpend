@@ -11,14 +11,16 @@ import androidx.room.PrimaryKey
  */
 @Entity(tableName = "packages")
 data class PackageEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,   // Auto ID
-    val trackingNumber: String,                        // UPS/FedEx/Canada Post tracking code
-    val carrier: String,                               // Carrier name
-    val store: String?,                                // Amazon, eBay, Walmart, etc.
-    val itemName: String?,                             // Name of product
-    val price: Double?,                                // Optional price
-    val orderDate: Long?,                              // Timestamp
-    val eta: Long?,                                    // Estimated delivery timestamp
-    val status: String,                                // "In Transit", "Delivered", etc.
-    val lastUpdate: Long                               // When we last updated this entry
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+
+    val trackingNumber: String,
+    val carrier: String,
+    val store: String?,
+    val itemName: String?,
+    val price: Double?,
+
+    val orderDate: String?,
+    val eta: String?,
+    val status: String,
+    val lastUpdate: Long
 )

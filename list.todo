@@ -52,17 +52,17 @@
 [✔] Add "Paste Email" text area
 [✔] Implement email parsing (extract tracking, price, etc.)
 [✔] Auto-detect carrier from tracking number
-[] Add save button → insert into DB
+[✔] Add save button → insert into DB
 [✔] Navigate back to Home on save
 
 # ===============================
 # PHASE 4 — HOME SCREEN
 # ===============================
 
-[ ] Create HomeScreen composable
-[ ] Observe packages from ViewModel
-[ ] Show list of packages (LazyColumn)
-[ ] Create package card UI
+[✔] Create HomeScreen composable
+[✔] Observe packages from ViewModel
+[✔] Show list of packages (LazyColumn)
+[✔] Create package card UI
 [ ] Add total spending UI
 [ ] Add "Add Package" floating button
 [ ] Add delete option (swipe or long-press)

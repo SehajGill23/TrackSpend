@@ -12,14 +12,17 @@ import androidx.room.Room
  */
 object DatabaseModule {
 
-    // Create the Room database
-    fun provideDatabase(context: Context): AppDatabase =
-        Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "TrackSpend.db"          // The actual database file stored on device
-        ).build()
+    private lateinit var db: AppDatabase
 
-    // Provide DAO instance
-    fun providePackageDao(db: AppDatabase) = db.packageDao()
+    fun init(context: Context) {
+        db = Room.databaseBuilder(
+            context.applicationContext,
+            AppDatabase::class.java,
+            "TrackSpend.db"
+        ).build()
+    }
+
+    fun provideDatabase(): AppDatabase = db
+
+    fun providePackageDao(): PackageDao = db.packageDao()
 }

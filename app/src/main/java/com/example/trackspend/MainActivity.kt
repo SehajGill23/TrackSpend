@@ -13,13 +13,14 @@ import com.example.trackspend.navigation.AppNavHost
 import com.example.trackspend.navigation.BottomNavBar
 import com.example.trackspend.ui.theme.TrackSpendTheme
 import  androidx.compose.ui.Modifier
-
+import com.example.trackspend.data.local.DatabaseModule
 
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DatabaseModule.init(applicationContext)
         setContent {
             TrackSpendTheme {
                 MainScreen()

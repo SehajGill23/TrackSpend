@@ -20,6 +20,8 @@ import kotlinx.coroutines.delay
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import com.example.trackspend.data.local.DatabaseModule
+import com.example.trackspend.data.local.PackageEntity
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -71,7 +73,7 @@ fun AddPackageScreen(
     // --- DATE FORMATTING HELPERS ---
 
 
-//     Auto-format to YYYY-MM-DD
+    //     Auto-format to YYYY-MM-DD
     fun formatDate(raw: String): String {
         val digits = raw.filter { it.isDigit() }
 
@@ -81,6 +83,7 @@ fun AddPackageScreen(
             digits.length <= 8 -> digits.substring(0, 4) + "-" +
                     digits.substring(4, 6) + "-" +
                     digits.substring(6)
+
             else -> digits.substring(0, 8).let {
                 it.substring(0, 4) + "-" + it.substring(4, 6) + "-" + it.substring(6, 8)
             }
@@ -278,15 +281,22 @@ fun AddPackageScreen(
                 if (!trackingError && !carrierError) {
                     val priceDouble = priceText.toDoubleOrNull()
 
-                    onSave(
-                        trackingNumber.trim(),
-                        if (carrier == "Other") customCarrier else carrier,
-                        store.trim(),
-                        itemName.trim(),
-                        priceDouble,
-                        orderDateField.text.trim()
-                    )
-                    navController.popBackStack()
+                    scope.launch {
+                        val entity = PackageEntity(
+                            trackingNumber = trackingNumber.trim(),
+                            carrier = if (carrier == "Other") customCarrier.trim() else carrier.trim(),
+                            store = store.trim().ifEmpty { null },
+                            itemName = itemName.trim().ifEmpty { null },
+                            price = priceDouble,
+                            orderDate = orderDateField.text.trim(),
+                            eta = null,
+                            status = "In Transit",
+                            lastUpdate = System.currentTimeMillis()
+                        )
+
+                        DatabaseModule.providePackageDao().insertPackage(entity)
+                        navController.popBackStack()
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -295,4 +305,3 @@ fun AddPackageScreen(
         }
     }
 }
-
