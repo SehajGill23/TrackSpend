@@ -21,43 +21,6 @@ import com.example.trackspend.viewmodel.PackageViewModelFactory
  *
  * Each composable() is one screen.
  */
-//fun AppNavHost(navController: NavHostController,
-//               modifier: Modifier = Modifier) {
-//
-//    NavHost(
-//        navController = navController,
-//        startDestination = Routes.HOME   // Default screen
-//    ) {
-//        // Home screen
-//        composable(Routes.HOME) {
-//            PlaceholderScreen("Home Screen")
-//        }
-//
-//        // Add-package screen
-//        composable(Routes.ADD) {
-//            AddPackageScreen(
-//                navController = navController,
-//                modifier = modifier,
-//                onSave = { tracking, carrier, store, itemName, price, date ->
-//                    // TODO: save to DB using ViewModel
-//                }
-//            )
-//        }
-//
-//        // Analytics screen
-//        composable(Routes.ANALYTICS) {
-//            PlaceholderScreen("Analytics Screen")
-//        }
-//
-//        // Details screen with a parameter (packageId)
-//        composable("${Routes.DETAILS}/{packageId}") { backStackEntry ->
-//            val id = backStackEntry.arguments?.getString("packageId")
-//            PlaceholderScreen("Details Screen - id: $id")
-//        }
-//    }
-//}
-
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(
