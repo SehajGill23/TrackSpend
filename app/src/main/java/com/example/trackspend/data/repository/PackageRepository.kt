@@ -32,4 +32,12 @@ class PackageRepository(
     suspend fun deletePackage(pkg: PackageEntity) {
         dao.deletePackage(pkg)
     }
+
+    suspend fun updatePinned(id: Int, value: Boolean) {
+        dao.updatePinned(id, value)
+    }
+
+    suspend fun updatePackage(pkg: PackageEntity) {
+        dao.updatePackage(pkg)
+    }
 }

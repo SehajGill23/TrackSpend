@@ -20,7 +20,7 @@ interface PackageDao {
     suspend fun updatePackage(pkg: PackageEntity)
 
     // Read all tracked packages, sorted by latest update
-    @Query("SELECT * FROM packages ORDER BY lastUpdate DESC")
+    @Query("SELECT * FROM packages ORDER BY isPinned DESC, lastUpdate DESC")
     fun getAllPackages(): Flow<List<PackageEntity>>
 
     // Calculate total spending (nullable)
@@ -33,4 +33,9 @@ interface PackageDao {
     // Delete a package
     @Delete
     suspend fun deletePackage(pkg: PackageEntity)
+
+    @Query("UPDATE packages SET isPinned = :value WHERE id = :id")
+    suspend fun updatePinned(id: Int, value: Boolean)
+
+
 }

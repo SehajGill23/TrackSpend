@@ -22,5 +22,6 @@ data class PackageEntity(
     val eta: String?,
     val status: String,
     val trackingHistoryJson: String?,
-    val lastUpdate: Long
+    val lastUpdate: Long,
+    val isPinned: Boolean = false
 )

@@ -47,6 +47,16 @@ class PackageViewModel(context: Context) : ViewModel() {
         return repo.getPackageById(id)
     }
 
+    fun updatePackage(pkg: PackageEntity) = viewModelScope.launch {
+        repo.updatePackage(pkg)
+    }
+
+    fun updatePinned(id: Int, value: Boolean) {
+        viewModelScope.launch {
+            repo.updatePinned(id, value)
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun refreshTracking(pkg: PackageEntity) {
         viewModelScope.launch(Dispatchers.IO) {

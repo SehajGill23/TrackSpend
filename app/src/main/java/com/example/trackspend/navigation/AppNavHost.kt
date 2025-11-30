@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trackspend.data.local.PackageEntity
 import com.example.trackspend.ui.add.AddPackageScreen
+import com.example.trackspend.ui.details.EditPackageScreen
 import com.example.trackspend.ui.details.PackageDetailScreen
 import com.example.trackspend.ui.home.HomeScreen
 import com.example.trackspend.viewmodel.PackageViewModel
@@ -76,6 +77,18 @@ fun AppNavHost(
 
             if (id != null) {
                 PackageDetailScreen(
+                    id = id,
+                    viewModel = vm,
+                    navController = navController
+                )
+            }
+        }
+
+        composable("edit/{id}") { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")?.toInt()
+
+            if (id != null) {
+                EditPackageScreen(
                     id = id,
                     viewModel = vm,
                     navController = navController
