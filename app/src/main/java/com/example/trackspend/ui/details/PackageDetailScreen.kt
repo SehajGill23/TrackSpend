@@ -1,36 +1,36 @@
 package com.example.trackspend.ui.details
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.trackspend.viewmodel.PackageViewModel
 import com.example.trackspend.data.local.PackageEntity
 import com.google.gson.Gson
 import com.example.trackspend.data.model.TrackingEvent
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PackageDetailScreen(
     id: Int,
     viewModel: PackageViewModel,
     navController: NavController
 ) {
-    // FIXED – retrieve item through ViewModel instead of accessing DAO
     val pkgFlow = viewModel.packageById(id)
     val pkg by pkgFlow.collectAsState(initial = null)
-
-    // Auto-refresh tracking on screen open
-    LaunchedEffect(id) {
-        pkg?.let { viewModel.refreshTracking(it) }
-    }
 
     if (pkg == null) {
         Text("Loading...", modifier = Modifier.padding(16.dp))
@@ -39,9 +39,13 @@ fun PackageDetailScreen(
 
     val item = pkg!!
 
+    var loading by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(18.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -54,15 +58,35 @@ fun PackageDetailScreen(
 
         MainInfoCard(item)
 
+
+        Button(
+            onClick = {
+                loading = true
+                scope.launch {
+                    try {
+                        viewModel.refreshTracking(item)
+                        delay(400)
+                    } finally {
+                        loading = false
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Track Package")
+        }
+
+        if (loading) Text("Tracking… Please wait.")
+
         Text(
             "Tracking Timeline",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
 
-        TrackingTimelineCard(item)
+        TrackingTimelineCard(pkg!!)
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(Modifier.height(32.dp))
 
         Button(
             onClick = { navController.popBackStack() },
@@ -106,15 +130,22 @@ fun TrackingTimelineCard(pkg: PackageEntity) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Real timeline events
-            val events: List<TrackingEvent> =
-                remember(pkg.trackingHistoryJson) {
+
+            var events by remember { mutableStateOf<List<TrackingEvent>>(emptyList()) }
+
+            LaunchedEffect(pkg.trackingHistoryJson) {
+                val parsed = try {
                     if (pkg.trackingHistoryJson.isNullOrEmpty()) emptyList()
                     else Gson().fromJson(
                         pkg.trackingHistoryJson,
                         Array<TrackingEvent>::class.java
                     ).toList()
+                } catch (e: Exception) {
+                    emptyList()
                 }
+
+                events = parsed
+            }
 
             if (events.isEmpty()) {
                 Text("No tracking updates yet.")
@@ -126,7 +157,6 @@ fun TrackingTimelineCard(pkg: PackageEntity) {
         }
     }
 }
-
 @Composable
 fun DetailRow(label: String, value: String) {
     Column {
@@ -135,3 +165,4 @@ fun DetailRow(label: String, value: String) {
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
+

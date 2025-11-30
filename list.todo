@@ -83,11 +83,11 @@
 # PHASE 6 — TRACKING ENGINE (UPGRADE)
 # ===============================
 
-[ ] Detect carrier using tracking number patterns
-[ ] Add Jsoup scrapers for tracking pages
-[ ] Implement "Update package status"
-[ ] Add ETA and delivery status detection
-[ ] Add WorkManager for background updates
+[✔] Detect carrier using tracking number patterns
+[✔] Add Jsoup scrapers for tracking pages
+[✔] Implement "Update package status"
+[✔] Add ETA and delivery status detection
+[✔] Add WorkManager for background updates
 
 # ===============================
 # PHASE 7 — UI POLISH
