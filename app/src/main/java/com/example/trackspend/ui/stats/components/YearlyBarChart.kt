@@ -61,7 +61,7 @@ fun YearlyBarChart(
                     yPos + 6.dp.toPx(),
                     android.graphics.Paint().apply {
                         color = textColor.copy(alpha = 0.75f).toArgb()
-                        textSize = 32f
+                        textSize = 28f
                         textAlign = android.graphics.Paint.Align.RIGHT
                     }
                 )
@@ -90,10 +90,10 @@ fun YearlyBarChart(
                 drawText(
                     month,
                     x + barWidth / 2,
-                    height - 20f,
+                    height - 4f,
                     android.graphics.Paint().apply {
                         color = textColor.copy(alpha = 0.8f).toArgb()
-                        textSize = 30f
+                        textSize = 25f
                         textAlign = android.graphics.Paint.Align.CENTER
                     }
                 )

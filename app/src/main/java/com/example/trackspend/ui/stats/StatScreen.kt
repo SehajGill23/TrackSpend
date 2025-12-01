@@ -114,7 +114,7 @@ fun StatsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 30.dp, start = 15.dp, end = 5.dp)
-                            .height(140.dp)
+                            .height(160.dp)
                     )
                 }
             )
@@ -132,7 +132,7 @@ fun StatsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 80.dp, start = 5.dp, end = 5.dp)
-                            .height(70.dp)
+                            .height(110.dp)
                     )
                 }
             )

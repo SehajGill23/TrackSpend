@@ -6,11 +6,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
-import androidx.compose.ui.graphics.drawscope.Fill
 
 private val monthLabels = listOf(
     "JAN","FEB","MAR","APR","MAY","JUN",
@@ -60,7 +63,7 @@ fun YearlyLineChart(
                     yPos + 6.dp.toPx(),
                     android.graphics.Paint().apply {
                         color = textColor.toArgb()
-                        textSize = 30f
+                        textSize = 28f
                         textAlign = android.graphics.Paint.Align.RIGHT
                     }
                 )
@@ -74,10 +77,10 @@ fun YearlyLineChart(
                 drawText(
                     month,
                     x,
-                    height - 20f,
+                    height - 4f,
                     android.graphics.Paint().apply {
                         color = textColor.toArgb()
-                        textSize = 30f
+                        textSize = 25f
                         textAlign = android.graphics.Paint.Align.CENTER
                     }
                 )

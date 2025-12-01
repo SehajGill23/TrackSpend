@@ -48,7 +48,6 @@ fun AppNavHost(
         composable(Routes.ADD) {
             AddPackageScreen(
                 navController = navController,
-                modifier = modifier,
                 onSave = { tracking, carrier, store, itemName, price, orderDate ->
 
                     vm.addPackage(
@@ -58,7 +57,7 @@ fun AppNavHost(
                             store = store.trim().ifEmpty { null },
                             itemName = itemName.trim().ifEmpty { null },
                             price = price,
-                            orderDate = orderDate.ifEmpty { null },  // ← FIXED
+                            orderDate = orderDate.trim().ifEmpty { null },
                             eta = null,
                             status = "N/A",
                             lastUpdate = System.currentTimeMillis(),
