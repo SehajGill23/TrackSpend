@@ -2,6 +2,8 @@
 
 package com.example.trackspend.ui.details
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -10,12 +12,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.trackspend.viewmodel.PackageViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EditPackageScreen(
     id: Int,
@@ -32,24 +37,57 @@ fun EditPackageScreen(
     val item = pkg!!
     val scope = rememberCoroutineScope()
 
-    // editable fields
+    // Editable fields
     var tracking by remember { mutableStateOf(item.trackingNumber) }
     var carrier by remember { mutableStateOf(item.carrier) }
     var itemName by remember { mutableStateOf(item.itemName ?: "") }
     var store by remember { mutableStateOf(item.store ?: "") }
     var price by remember { mutableStateOf(item.price?.toString() ?: "") }
 
-    // detect unsaved changes
+    // DATE field (TextFieldValue like Add screen)
+    var orderDateField by remember {
+        mutableStateOf(TextFieldValue(item.orderDate ?: ""))
+    }
+
+    // ---- Formatting helpers ----
+    fun formatDate(raw: String): String {
+        val digits = raw.filter { it.isDigit() }
+        return when {
+            digits.length <= 4 -> digits
+            digits.length <= 6 ->
+                digits.substring(0, 4) + "-" + digits.substring(4)
+            digits.length <= 8 ->
+                digits.substring(0, 4) + "-" +
+                        digits.substring(4, 6) + "-" +
+                        digits.substring(6)
+            else ->
+                digits.substring(0, 8).let {
+                    it.substring(0, 4) + "-" + it.substring(4, 6) + "-" + it.substring(6, 8)
+                }
+        }
+    }
+
+    fun isValidDate(formatted: String): Boolean {
+        return try {
+            if (formatted.length != 10) return false
+            LocalDate.parse(formatted)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    // ❗ detect unsaved changes
     val hasChanges =
         tracking != item.trackingNumber ||
                 carrier != item.carrier ||
                 itemName != (item.itemName ?: "") ||
                 store != (item.store ?: "") ||
-                price != (item.price?.toString() ?: "")
+                price != (item.price?.toString() ?: "") ||
+                orderDateField.text != (item.orderDate ?: "")
 
     var showExitDialog by remember { mutableStateOf(false) }
 
-    // Leave screen alert
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
@@ -91,7 +129,6 @@ fun EditPackageScreen(
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 
-            // Tracking ID
             OutlinedTextField(
                 value = tracking,
                 onValueChange = { tracking = it },
@@ -99,7 +136,6 @@ fun EditPackageScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Carrier
             OutlinedTextField(
                 value = carrier,
                 onValueChange = { carrier = it },
@@ -107,7 +143,6 @@ fun EditPackageScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Item name
             OutlinedTextField(
                 value = itemName,
                 onValueChange = { itemName = it },
@@ -115,7 +150,6 @@ fun EditPackageScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Store
             OutlinedTextField(
                 value = store,
                 onValueChange = { store = it },
@@ -123,11 +157,9 @@ fun EditPackageScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Price – ONLY NUMBERS NOW
             OutlinedTextField(
                 value = price,
                 onValueChange = { input ->
-                    // allow only digits and decimals
                     if (input.matches(Regex("^\\d*\\.?\\d*\$"))) {
                         price = input
                     }
@@ -137,7 +169,32 @@ fun EditPackageScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // SAVE BUTTON RIGHT UNDER LAST FIELD
+            // ---- DATE FIELD (same as Add screen) ----
+            var orderDateError by remember { mutableStateOf(false) }
+
+            OutlinedTextField(
+                value = orderDateField,
+                onValueChange = { new ->
+                    val formatted = formatDate(new.text.trim())
+
+                    orderDateField = TextFieldValue(
+                        text = formatted,
+                        selection = TextRange(formatted.length)
+                    )
+
+                    orderDateError =
+                        formatted.isNotEmpty() && !isValidDate(formatted)
+                },
+                label = { Text("Order Date (YYYY-MM-DD)") },
+                isError = orderDateError,
+                supportingText = {
+                    if (orderDateError) Text("Enter a valid date like 2025-02-11")
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // ---- SAVE ----
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -150,7 +207,8 @@ fun EditPackageScreen(
                                 carrier = carrier,
                                 itemName = itemName,
                                 store = store,
-                                price = price.toDoubleOrNull()
+                                price = price.toDoubleOrNull(),
+                                orderDate = orderDateField.text.ifEmpty { null }
                             )
                         )
                         navController.popBackStack()

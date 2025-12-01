@@ -60,9 +60,9 @@ fun AppNavHost(
                             store = store,
                             itemName = itemName,
                             price = price,
-                            orderDate = null,
+                            orderDate = "N/A",
                             eta = null,
-                            status = "In Transit",
+                            status = "N/A",
                             lastUpdate = System.currentTimeMillis(),
                             trackingHistoryJson = null,
                         )

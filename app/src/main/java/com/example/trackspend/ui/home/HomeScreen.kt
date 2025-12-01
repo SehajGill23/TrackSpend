@@ -20,6 +20,7 @@ import com.example.trackspend.data.local.PackageEntity
 import com.example.trackspend.navigation.Routes
 import com.example.trackspend.viewmodel.PackageViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.ui.Alignment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,7 +80,7 @@ fun HomeScreen(
                             scope.launch { sheetState.hide() }
                                 .invokeOnCompletion { showSheet = false }
 
-                            navController.navigate("${Routes.DETAILS}/${pkg.id}")
+                            navController.navigate("edit/${pkg.id}")
                         }
                         .padding(12.dp)
                 ) {
@@ -148,40 +149,83 @@ fun HomeScreen(
         )
     }
 
-    // --- SCREEN CONTENT ---
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-
-        SearchBar(
-            query = search,
-            onQueryChange = { search = it }
-        )
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize()
+    Scaffold(
+    ) { padding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(8.dp)
         ) {
-            items(filtered) { pkg ->
+            // --- SCREEN CONTENT ---
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
 
-                PackageCard(
-                    pkg = pkg,
-                    onClick = {
-                        navController.navigate("${Routes.DETAILS}/${pkg.id}")
-                    },
-                    onLongPress = {
-                        selectedPkg = pkg
-                        showSheet = true
-                        scope.launch { sheetState.show() }
-                    }
+                SearchBar(
+                    query = search,
+                    onQueryChange = { search = it }
                 )
+
+
+                // If no packages found
+                if (filtered.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No packages added yet",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    return@Column
+                }
+
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(filtered) { pkg ->
+
+                        PackageCard(
+                            pkg = pkg,
+                            onClick = {
+                                navController.navigate("${Routes.DETAILS}/${pkg.id}")
+                            },
+                            onLongPress = {
+                                selectedPkg = pkg
+                                showSheet = true
+                                scope.launch { sheetState.show() }
+                            }
+                        )
+                    }
+                }
             }
         }
     }
 }
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun TrackSpendTopBar() {
+        TopAppBar(
+            title = {
+                Text(
+                    "TrackSpend",
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = MaterialTheme.colorScheme.onBackground
+            )
+        )
+    }
 @Composable
 fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
     TextField(
@@ -190,7 +234,7 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
         placeholder = { Text("Search packages…") },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 12.dp)
+            .padding(bottom = 10.dp)
             .height(52.dp),
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.colors(

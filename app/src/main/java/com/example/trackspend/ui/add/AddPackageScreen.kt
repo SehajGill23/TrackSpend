@@ -291,7 +291,7 @@ fun AddPackageScreen(
                             price = priceDouble,
                             orderDate = orderDateField.text.trim(),
                             eta = null,
-                            status = "In Transit",
+                            status = "N/A",
                             lastUpdate = System.currentTimeMillis(),
                             trackingHistoryJson = null
                         )

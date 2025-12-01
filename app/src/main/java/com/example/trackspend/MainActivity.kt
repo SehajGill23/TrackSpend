@@ -13,12 +13,18 @@ import com.example.trackspend.navigation.AppNavHost
 import com.example.trackspend.navigation.BottomNavBar
 import com.example.trackspend.ui.theme.TrackSpendTheme
 import  androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
+import androidx.activity.enableEdgeToEdge
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.trackspend.data.local.DatabaseModule
 
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+        WindowInsetsControllerCompat(window, window.decorView)
+            .isAppearanceLightStatusBars = true
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         DatabaseModule.init(applicationContext)
         setContent {
