@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.trackspend.navigation.Routes
+import com.example.trackspend.ui.stats.components.SegmentedRing
 import com.example.trackspend.viewmodel.PackageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,6 +75,7 @@ fun StatsScreen(
                 totalStores = totalStores,
                 topStoreName = topStoreName,
                 topStorePercent = topStorePercent,
+                storeCounts = storeCounts,
                 onClick = { navController.navigate(Routes.STATS_SUMMARY) }
             )
 
@@ -103,6 +104,7 @@ private fun SummaryStatsCard(
     totalStores: Int,
     topStoreName: String,
     topStorePercent: Float,
+    storeCounts: Map<String, Int>,
     onClick: () -> Unit,
 
 ) {
@@ -125,9 +127,9 @@ private fun SummaryStatsCard(
                 modifier = Modifier.size(90.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(
-                    progress = { if (hasData) topStorePercent else 0f },
-                    strokeWidth = 10.dp
+                SegmentedRing(
+                    segments = storeCounts,
+                    total = totalOrders
                 )
                 Text(
                     text = if (hasData) "${(topStorePercent * 100).toInt()}%" else "0%",

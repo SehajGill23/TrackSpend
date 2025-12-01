@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.trackspend.ui.stats.components.SegmentedRing
 import com.example.trackspend.viewmodel.PackageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,17 +83,23 @@ fun StatsSummaryDetailScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                    CircularProgressIndicator(
-                        progress = { if (hasData) topPercent else 0f },
-                        strokeWidth = 12.dp,
-                        modifier = Modifier.size(130.dp)
+                    SegmentedRing(
+                        segments = storeCounts,
+                        total = totalOrders,
+                        modifier = Modifier.size(220.dp)  // bigger ring here
                     )
 
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(16.dp))
 
                     Text(
-                        text = "${(topPercent * 100).toInt()}% from $topName",
+                        text = "Top store: $topName",
                         style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Text(
+                        text = "${(topPercent * 100).toInt()}% of all orders",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
