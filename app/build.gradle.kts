@@ -49,59 +49,47 @@ android {
         compose = true
     }
 }
-
 dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // Compose BOM (controls all versions)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.compose.material3:material3:1.2.1")
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("androidx.compose.material:material-icons-extended:1.6.1")
-    // --- Room (local database) ---
-    implementation("androidx.room:room-runtime:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // Icons
+    implementation("androidx.compose.material:material-icons-extended")
+
+    // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    // Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+
+    // Timeline (your tracking UI)
     implementation("com.github.vipulasri:timelineview-compose:1.2.2")
+
+    // Jsoup
     implementation("org.jsoup:jsoup:1.17.2")
 
-    // --- Retrofit (API calls) ---
+    // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
 
-
-
-    implementation("androidx.compose.foundation:foundation:1.5.1")
-
-    // Jetpack Compose Charts
-    implementation(" androidx.compose.material3:material3-adaptive-navigation-suite:1.0.0")
-    implementation("androidx.compose.foundation:foundation-graphics:1.6.0")
-
-    // NEW: Official CHARTS LIBRARY
-    implementation("androidx.compose.material3:material3-chronicle:1.0.0-alpha04")
-
-
-
-
-
-    // --- Jsoup (HTML parsing for tracking websites) ---
-    implementation("org.jsoup:jsoup:1.17.2")
-
-    // --- Kotlin Coroutines ---
+    // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }
-
 

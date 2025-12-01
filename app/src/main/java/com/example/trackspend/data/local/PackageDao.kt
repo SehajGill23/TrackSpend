@@ -1,8 +1,12 @@
 package com.example.trackspend.data.local
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
 
 /**
  * PackageDao contains all SQL queries for the packages table.
@@ -31,6 +35,9 @@ interface PackageDao {
 
     @Query("SELECT * FROM packages WHERE id = :id")
     fun getPackageById(id: Int): Flow<PackageEntity?>
+
+    @Query("SELECT store, COUNT(*) AS count FROM packages GROUP BY store")
+    fun getOrdersByStore(): Flow<List<com.example.trackspend.data.model.StoreCount>>
 
     // Delete a package
     @Delete

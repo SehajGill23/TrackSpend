@@ -37,6 +37,9 @@ class PackageRepository(
         dao.updatePinned(id, value)
     }
 
+
+    fun getOrdersByStore() = dao.getOrdersByStore()
+
     suspend fun updatePackage(pkg: PackageEntity) {
         dao.updatePackage(pkg)
     }

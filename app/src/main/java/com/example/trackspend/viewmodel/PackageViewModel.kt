@@ -1,7 +1,5 @@
 package com.example.trackspend.viewmodel
 
-import com.example.trackspend.data.tracking.track17.TrackingRepository17
-
 
 import android.content.Context
 import android.os.Build
@@ -12,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.trackspend.data.local.DatabaseModule
 import com.example.trackspend.data.local.PackageEntity
 import com.example.trackspend.data.repository.PackageRepository
+import com.example.trackspend.data.tracking.track17.TrackingRepository17
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +35,9 @@ class PackageViewModel(context: Context) : ViewModel() {
             repo.insertPackage(pkg)
         }
     }
+
+    val ordersByStore = repo.getOrdersByStore()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     fun deletePackage(pkg: PackageEntity) {
         viewModelScope.launch {

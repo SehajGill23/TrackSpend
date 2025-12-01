@@ -37,31 +37,21 @@ fun StatsScreen(
 ) {
     val packages by viewModel.allPackages.collectAsState()
     val totalSpent by viewModel.totalSpent.collectAsState()
+    val storeCounts by viewModel.ordersByStore.collectAsState()
 
     val hasData = packages.isNotEmpty()
     val safeTotal = totalSpent ?: 0.0
 
-    // 🔹 Store counts ("Amazon" = 3, "Nike" = 1, etc.)
-    val storeCounts = packages
-        .groupBy { it.store ?: "Unknown" }
-        .mapValues { it.value.size }
-
     val totalOrders = packages.size
 
-    // 🔹 Top store % for radial ring
-    val topStorePercent: Float =
-        if (totalOrders > 0 && storeCounts.isNotEmpty()) {
-            val maxStoreOrders = storeCounts.maxOf { it.value }
-            (maxStoreOrders.toFloat() / totalOrders.toFloat()).coerceIn(0f, 1f)
-        } else 0f
+    // 🟦 FIXED store counts logic
+    val topStore = storeCounts.maxByOrNull { it.count }
+    val topStoreName = topStore?.store ?: "Unknown"
+    val topStorePercent =
+        if (topStore != null && totalOrders > 0)
+            (topStore.count.toFloat() / totalOrders.toFloat()).coerceIn(0f, 1f)
+        else 0f
 
-    // 🔹 Top store name
-    val topStoreName: String =
-        if (storeCounts.isNotEmpty())
-            storeCounts.maxByOrNull { it.value }!!.key
-        else "Unknown"
-
-    // 🔹 Distinct stores
     val totalStores = storeCounts.size
 
     Scaffold(
@@ -78,7 +68,6 @@ fun StatsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            // 🔵 UPDATED SUMMARY CARD (now store-based ring)
             SummaryStatsCard(
                 hasData = hasData,
                 totalSpent = safeTotal,
@@ -86,9 +75,7 @@ fun StatsScreen(
                 totalStores = totalStores,
                 topStoreName = topStoreName,
                 topStorePercent = topStorePercent,
-                modifier = Modifier.clickable {
-                    // later we'll open the full summary detail
-                }
+                modifier = Modifier.clickable { }
             )
 
             StatsMiniCard(
@@ -122,7 +109,6 @@ private fun SummaryStatsCard(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -131,7 +117,7 @@ private fun SummaryStatsCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            // ⭐ LEFT SIDE: store distribution radial ring
+            // ⭕ Radial ring
             Box(
                 modifier = Modifier.size(90.dp),
                 contentAlignment = Alignment.Center
@@ -147,7 +133,7 @@ private fun SummaryStatsCard(
                 )
             }
 
-            // ⭐ RIGHT SIDE: summary info
+            // 📊 Summary text
             Column(
                 verticalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.weight(1f)
