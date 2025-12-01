@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -66,15 +68,26 @@ fun StatsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Stats", style = MaterialTheme.typography.titleLarge) })
+            TopAppBar(
+                title = {
+                    Text(
+                        "Stats",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
+                },
+                modifier = Modifier.height(65.dp)  // thinner top bar
+            )
         }
+
     ) { padding ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
@@ -100,6 +113,7 @@ fun StatsScreen(
                         maxY = (viewModel.getYearlySpending().maxOrNull() ?: 1f),
                         modifier = Modifier
                             .fillMaxWidth()
+                            .padding(top = 30.dp, start = 15.dp, end = 5.dp)
                             .height(140.dp)
                     )
                 }
@@ -111,17 +125,22 @@ fun StatsScreen(
                 enabled = hasData,
                 onClick = { navController.navigate(Routes.STATS_ORDERS) },
                 chart = {
+                    Spacer(Modifier.height(20.dp))
                     YearlyBarChart(
                         data = viewModel.getYearlyOrders(),
                         maxY = (viewModel.getYearlyOrders().maxOrNull() ?: 1f),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(140.dp)
+                            .padding(top = 80.dp, start = 5.dp, end = 5.dp)
+                            .height(70.dp)
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(100.dp))
         }
     }
+
+
 }
 
 @Composable
@@ -231,7 +250,7 @@ fun StatsMiniCard(
             )
 
             // Add vertical space before graph
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(0.3.dp))
 
             // Chart goes here
             chart()
