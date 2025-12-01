@@ -64,6 +64,16 @@ class PackageViewModel(context: Context) : ViewModel() {
             .eachCount()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
+
+    val monthlySpending = allPackages.map { list ->
+        list
+            .filter { it.orderDate != null }
+            .groupBy { it.orderDate!!.substring(0, 7) }  // "2025-02"
+            .mapValues { (_, items) ->
+                items.sumOf { it.price ?: 0.0 }
+            }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun refreshTracking(pkg: PackageEntity) {
         viewModelScope.launch(Dispatchers.IO) {

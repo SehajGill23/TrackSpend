@@ -22,7 +22,9 @@ fun SegmentedRing(
     total: Int,
     modifier: Modifier = Modifier.size(160.dp),
     strokeWidth: Float = 32f,
-    showLabels: Boolean = true
+    showLabels: Boolean = true,
+    labelColor: Int = android.graphics.Color.argb(180, 255, 255, 255)
+
 
 ) {
     if (total == 0 || segments.isEmpty()) return
@@ -88,7 +90,7 @@ fun SegmentedRing(
                         labelX,
                         labelY,
                         android.graphics.Paint().apply {
-                            color = android.graphics.Color.argb(180, 255, 255, 255) // soft white
+                            color = labelColor
                             textSize = 32f
                             textAlign = android.graphics.Paint.Align.CENTER
                         }

@@ -13,4 +13,5 @@ object Routes {
     const val STATS_ORDERS = "stats_orders"
 
     const val STATS_SUMMARY = "stats_summary"
+
 }

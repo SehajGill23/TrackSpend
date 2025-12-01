@@ -29,15 +29,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.trackspend.ui.stats.components.SegmentedRing
 import com.example.trackspend.viewmodel.PackageViewModel
-
-
-
 
 
 @Composable
@@ -105,6 +103,18 @@ fun StatsSummaryDetailScreen(
         else
             0f
 
+
+    val isLightTheme = MaterialTheme.colorScheme.background.luminance() > 0.5f
+
+    val ringLabelColor: Int =
+        if (isLightTheme) {
+            // soft dark text for light background
+            android.graphics.Color.argb(190, 0, 0, 0)
+        } else {
+            // soft white for dark background
+            android.graphics.Color.argb(190, 255, 255, 255)
+        }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -145,7 +155,9 @@ fun StatsSummaryDetailScreen(
                             segments = storeCounts,
                             total = totalOrders,
                             modifier = Modifier.size(260.dp),
-                            showLabels = true
+                            showLabels = true,
+                            labelColor = ringLabelColor
+
                         )
 
                         // centered text overlay
