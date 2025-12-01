@@ -150,6 +150,7 @@ fun HomeScreen(
     }
 
     Scaffold(
+        topBar = { TrackSpendTopBar() }
     ) { padding ->
         Column(
             Modifier
