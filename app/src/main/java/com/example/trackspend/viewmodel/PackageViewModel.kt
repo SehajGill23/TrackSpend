@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class PackageViewModel(context: Context) : ViewModel() {
 
@@ -65,14 +66,125 @@ class PackageViewModel(context: Context) : ViewModel() {
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
 
-    val monthlySpending = allPackages.map { list ->
-        list
-            .filter { it.orderDate != null }
-            .groupBy { it.orderDate!!.substring(0, 7) }  // "2025-02"
-            .mapValues { (_, items) ->
-                items.sumOf { it.price ?: 0.0 }
+    // -------------------------------Monthly Parsing methods------------------------------------
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun parseOrderDate(raw: String?): LocalDate? {
+        if (raw.isNullOrBlank()) return null
+        if (raw.equals("N/A", ignoreCase = true)) return null
+
+        val cleaned = raw.trim()
+
+        return try {
+            // Case 1: directly parse yyyy-MM-dd
+            LocalDate.parse(cleaned)
+        } catch (_: Exception) {
+            try {
+                // Case 2: parse yyyyMMdd (8 digits)
+                if (cleaned.length == 8 && cleaned.all { it.isDigit() }) {
+                    val yyyy = cleaned.substring(0, 4)
+                    val mm = cleaned.substring(4, 6)
+                    val dd = cleaned.substring(6, 8)
+                    LocalDate.parse("$yyyy-$mm-$dd")
+                } else null
+            } catch (_: Exception) {
+                null
             }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    val monthlyPackages = allPackages
+        .map { list ->
+            val today = LocalDate.now()
+
+            val start = today.withDayOfMonth(1)
+            val end = today.withDayOfMonth(today.lengthOfMonth())
+
+            list.filter { pkg ->
+                val date = parseOrderDate(pkg.orderDate)
+                date != null && date >= start && date <= end
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    val monthlySpent = monthlyPackages
+        .map { list -> list.sumOf { it.price ?: 0.0 } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0.0)
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    val monthlyOrders = monthlyPackages
+        .map { it.size }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    val monthlyOrdersByStore = monthlyPackages
+        .map { list ->
+            list.mapNotNull { it.store?.takeIf { s -> s.isNotBlank() } }
+                .groupingBy { it }
+                .eachCount()
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
+    // -------------------------------Monthly Parsing methods------------------------------------
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getDailySpending(): List<Float> {
+        val days = LocalDate.now().lengthOfMonth()
+        val spending = MutableList(days) { 0f }
+
+        monthlyPackages.value.forEach { pkg ->
+            val date = LocalDate.parse(pkg.orderDate)
+            val day = date.dayOfMonth - 1
+            spending[day] += (pkg.price ?: 0.0).toFloat()
+        }
+
+        return spending
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getYearlySpending(): List<Float> {
+        val list = allPackages.value
+        val currentYear = LocalDate.now().year
+        val totals = MutableList(12) { 0f }
+
+        list.forEach { pkg ->
+            val raw = pkg.orderDate ?: return@forEach
+            try {
+                val date = LocalDate.parse(raw)
+                if (date.year == currentYear) {
+                    val index = date.monthValue - 1
+                    totals[index] += (pkg.price ?: 0.0).toFloat()
+                }
+            } catch (_: Exception) { }
+        }
+
+        return totals
+    }
+
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getYearlyOrders(): List<Float> {
+        val list = allPackages.value
+        val currentYear = LocalDate.now().year
+        val totals = MutableList(12) { 0f }
+
+        list.forEach { pkg ->
+            val raw = pkg.orderDate ?: return@forEach
+            try {
+                val date = LocalDate.parse(raw)
+                if (date.year == currentYear) {
+                    val index = date.monthValue - 1
+                    totals[index] += 1f
+                }
+            } catch (_: Exception) { }
+        }
+
+        return totals
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun refreshTracking(pkg: PackageEntity) {

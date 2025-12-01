@@ -1,5 +1,7 @@
 package com.example.trackspend.ui.stats
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -78,6 +80,7 @@ fun StatRow(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsSummaryDetailScreen(
@@ -85,13 +88,14 @@ fun StatsSummaryDetailScreen(
     viewModel: PackageViewModel
 ) {
     val packages by viewModel.allPackages.collectAsState()
-    val totalSpent by viewModel.totalSpent.collectAsState()
-    val storeCounts by viewModel.ordersByStore.collectAsState()
+
+    val monthlySpent by viewModel.monthlySpent.collectAsState()
+    val totalOrders by viewModel.monthlyOrders.collectAsState()
+    val storeCounts by viewModel.monthlyOrdersByStore.collectAsState()
 
     val hasData = packages.isNotEmpty()
-    val totalOrders = packages.size
-    val totalStores = storeCounts.size
-    val safeTotal = totalSpent ?: 0.0
+    val totalStores =  storeCounts.size
+    val safeTotal = monthlySpent ?: 0.0
 
 // after safeTotal
     val topStoreEntry = storeCounts.maxByOrNull { it.value }
@@ -102,7 +106,6 @@ fun StatsSummaryDetailScreen(
             topStoreEntry.value.toFloat() / totalOrders.toFloat()
         else
             0f
-
 
     val isLightTheme = MaterialTheme.colorScheme.background.luminance() > 0.5f
 
@@ -118,7 +121,7 @@ fun StatsSummaryDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Summary Overview") },
+                title = { Text("Monthly Summary Overview") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = null)

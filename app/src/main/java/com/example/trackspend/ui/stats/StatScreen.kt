@@ -1,12 +1,16 @@
 package com.example.trackspend.ui.stats
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
@@ -27,8 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.trackspend.navigation.Routes
 import com.example.trackspend.ui.stats.components.SegmentedRing
+import com.example.trackspend.ui.stats.components.YearlyBarChart
+import com.example.trackspend.ui.stats.components.YearlyLineChart
 import com.example.trackspend.viewmodel.PackageViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(
@@ -36,23 +43,26 @@ fun StatsScreen(
     navController: NavController
 ) {
     val packages by viewModel.allPackages.collectAsState()
-    val totalSpent by viewModel.totalSpent.collectAsState()
-    val storeCounts by viewModel.ordersByStore.collectAsState()
+    val monthlySpent by viewModel.monthlySpent.collectAsState()
+    val monthlyOrders by viewModel.monthlyOrders.collectAsState()
+    val monthlyStoreCounts by viewModel.monthlyOrdersByStore.collectAsState()
+
+    val safeTotal = monthlySpent
+    val totalOrders = monthlyOrders
+    val totalStores = monthlyStoreCounts.size
+
 
     val hasData = packages.isNotEmpty()
-    val safeTotal = totalSpent ?: 0.0
 
-    val totalOrders = packages.size
 
     // 🟦 FIXED store counts logic
-    val topEntry = storeCounts.maxByOrNull { it.value }
+    val topEntry = monthlyStoreCounts.maxByOrNull { it.value }
     val topStoreName = topEntry?.key ?: "Unknown"
 
     val topStorePercent =
         if (topEntry != null && totalOrders > 0)
             (topEntry.value.toFloat() / totalOrders.toFloat()).coerceIn(0f, 1f)
         else 0f
-    val totalStores = storeCounts.size
 
     Scaffold(
         topBar = {
@@ -75,22 +85,40 @@ fun StatsScreen(
                 totalStores = totalStores,
                 topStoreName = topStoreName,
                 topStorePercent = topStorePercent,
-                storeCounts = storeCounts,
+                storeCounts = monthlyStoreCounts,
                 onClick = { navController.navigate(Routes.STATS_SUMMARY) }
             )
 
             StatsMiniCard(
                 title = "Monthly spending",
-                subtitle = if (hasData) "Tap to view chart" else "No packages yet",
+                subtitle = if (hasData) "Tap to view chart" else "No data",
                 enabled = hasData,
-                onClick = { navController.navigate(Routes.STATS_SPENDING) }
+                onClick = { navController.navigate(Routes.STATS_SPENDING) },
+                chart = {
+                    YearlyLineChart(
+                        data = viewModel.getYearlySpending(),
+                        maxY = (viewModel.getYearlySpending().maxOrNull() ?: 1f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(140.dp)
+                    )
+                }
             )
 
             StatsMiniCard(
-                title = "Orders by store",
-                subtitle = if (hasData) "Tap to view chart" else "No packages yet",
+                title = "Orders by month",
+                subtitle = if (hasData) "Tap to view chart" else "No data",
                 enabled = hasData,
-                onClick = { navController.navigate(Routes.STATS_ORDERS) }
+                onClick = { navController.navigate(Routes.STATS_ORDERS) },
+                chart = {
+                    YearlyBarChart(
+                        data = viewModel.getYearlyOrders(),
+                        maxY = (viewModel.getYearlyOrders().maxOrNull() ?: 1f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(140.dp)
+                    )
+                }
             )
         }
     }
@@ -174,34 +202,39 @@ private fun SummaryStatsCard(
 }
 
 @Composable
-private fun StatsMiniCard(
+fun StatsMiniCard(
     title: String,
     subtitle: String,
     enabled: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    chart: @Composable (() -> Unit)
 ) {
-    val alpha = if (enabled) 1f else 0.5f
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .alpha(alpha)
+            .alpha(if (enabled) 1f else 0.5f)
             .then(if (enabled) Modifier.clickable { onClick() } else Modifier),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
-
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+                .padding(16.dp)
+                .padding(bottom = 12.dp)  // extra breathing room
         ) {
+
+            // Text content
             Text(title, style = MaterialTheme.typography.titleMedium)
             Text(
                 subtitle,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            // Add vertical space before graph
+            Spacer(Modifier.height(14.dp))
+
+            // Chart goes here
+            chart()
         }
     }
 }
