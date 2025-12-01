@@ -2,6 +2,8 @@ package com.example.trackspend.ui.stats
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,8 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.trackspend.viewmodel.PackageViewModel
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Column
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,8 +70,8 @@ fun StatsOrdersDetailScreen(
                                     .padding(16.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(sc.store ?: "Unknown")
-                                Text("${sc.count} orders")
+                                Text(text = sc.key.ifBlank { "Unknown" })
+                                Text(text = "${sc.value} orders")
                             }
                         }
                     }

@@ -45,13 +45,13 @@ fun StatsScreen(
     val totalOrders = packages.size
 
     // 🟦 FIXED store counts logic
-    val topStore = storeCounts.maxByOrNull { it.count }
-    val topStoreName = topStore?.store ?: "Unknown"
-    val topStorePercent =
-        if (topStore != null && totalOrders > 0)
-            (topStore.count.toFloat() / totalOrders.toFloat()).coerceIn(0f, 1f)
-        else 0f
+    val topEntry = storeCounts.maxByOrNull { it.value }
+    val topStoreName = topEntry?.key ?: "Unknown"
 
+    val topStorePercent =
+        if (topEntry != null && totalOrders > 0)
+            (topEntry.value.toFloat() / totalOrders.toFloat()).coerceIn(0f, 1f)
+        else 0f
     val totalStores = storeCounts.size
 
     Scaffold(
@@ -75,7 +75,7 @@ fun StatsScreen(
                 totalStores = totalStores,
                 topStoreName = topStoreName,
                 topStorePercent = topStorePercent,
-                modifier = Modifier.clickable { }
+                onClick = { navController.navigate(Routes.STATS_SUMMARY) }
             )
 
             StatsMiniCard(
@@ -103,10 +103,13 @@ private fun SummaryStatsCard(
     totalStores: Int,
     topStoreName: String,
     topStorePercent: Float,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit,
+
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },   // <-- THIS makes the card clickable
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
@@ -117,7 +120,7 @@ private fun SummaryStatsCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            // ⭕ Radial ring
+            //  Radial ring
             Box(
                 modifier = Modifier.size(90.dp),
                 contentAlignment = Alignment.Center

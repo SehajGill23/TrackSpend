@@ -9,8 +9,8 @@ object Routes {
     const val ADD = "add"
     const val ANALYTICS = "analytics"
     const val DETAILS = "details"
-
     const val STATS_SPENDING = "stats_spending"
-
     const val STATS_ORDERS = "stats_orders"
+
+    const val STATS_SUMMARY = "stats_summary"
 }

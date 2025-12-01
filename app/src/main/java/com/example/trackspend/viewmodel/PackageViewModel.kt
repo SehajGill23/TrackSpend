@@ -15,6 +15,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -36,9 +37,6 @@ class PackageViewModel(context: Context) : ViewModel() {
         }
     }
 
-    val ordersByStore = repo.getOrdersByStore()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
     fun deletePackage(pkg: PackageEntity) {
         viewModelScope.launch {
             repo.deletePackage(pkg)
@@ -58,6 +56,13 @@ class PackageViewModel(context: Context) : ViewModel() {
             repo.updatePinned(id, value)
         }
     }
+
+    val ordersByStore = allPackages.map { list ->
+        list
+            .mapNotNull { it.store?.takeIf { s -> s.isNotBlank() } }
+            .groupingBy { it }
+            .eachCount()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun refreshTracking(pkg: PackageEntity) {

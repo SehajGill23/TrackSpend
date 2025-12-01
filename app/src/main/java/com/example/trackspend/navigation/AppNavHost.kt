@@ -17,6 +17,7 @@ import com.example.trackspend.ui.home.HomeScreen
 import com.example.trackspend.ui.stats.StatsOrdersDetailScreen
 import com.example.trackspend.ui.stats.StatsScreen
 import com.example.trackspend.ui.stats.StatsSpendingDetailScreen
+import com.example.trackspend.ui.stats.StatsSummaryDetailScreen
 import com.example.trackspend.viewmodel.PackageViewModel
 import com.example.trackspend.viewmodel.PackageViewModelFactory
 
@@ -113,6 +114,13 @@ fun AppNavHost(
         // 🏪 ORDERS BY STORE CHART PAGE
         composable(Routes.STATS_ORDERS) {
             StatsOrdersDetailScreen(
+                navController = navController,
+                viewModel = vm
+            )
+        }
+
+        composable(Routes.STATS_SUMMARY) {
+            StatsSummaryDetailScreen(
                 navController = navController,
                 viewModel = vm
             )
