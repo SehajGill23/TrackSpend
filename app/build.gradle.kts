@@ -83,6 +83,20 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
 
 
+
+    implementation("androidx.compose.foundation:foundation:1.5.1")
+
+    // Jetpack Compose Charts
+    implementation(" androidx.compose.material3:material3-adaptive-navigation-suite:1.0.0")
+    implementation("androidx.compose.foundation:foundation-graphics:1.6.0")
+
+    // NEW: Official CHARTS LIBRARY
+    implementation("androidx.compose.material3:material3-chronicle:1.0.0-alpha04")
+
+
+
+
+
     // --- Jsoup (HTML parsing for tracking websites) ---
     implementation("org.jsoup:jsoup:1.17.2")
 
