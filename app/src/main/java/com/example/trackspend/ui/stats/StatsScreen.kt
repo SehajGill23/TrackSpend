@@ -129,7 +129,8 @@ private fun SummaryStatsCard(
             ) {
                 SegmentedRing(
                     segments = storeCounts,
-                    total = totalOrders
+                    total = totalOrders,
+                    showLabels = false
                 )
                 Text(
                     text = if (hasData) "${(topStorePercent * 100).toInt()}%" else "0%",
