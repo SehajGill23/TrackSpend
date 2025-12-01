@@ -2,6 +2,7 @@ package com.example.trackspend.ui.stats
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,7 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -27,8 +28,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.trackspend.ui.stats.components.ThinToggleSwitch
 import com.example.trackspend.ui.stats.components.YearlyBarChart
 import com.example.trackspend.ui.stats.components.YearlyLineChart
 import com.example.trackspend.viewmodel.PackageViewModel
@@ -43,7 +46,7 @@ fun StatsOrdersDetailScreen(
     val yearlyOrders = viewModel.getYearlyOrders()
 
     val maxY = (yearlyOrders.maxOrNull() ?: 1f) * 1.3f
-    var isBar by remember { mutableStateOf(true) }
+    var showBar by remember { mutableStateOf(true) }
 
     Scaffold(
         topBar = {
@@ -67,40 +70,55 @@ fun StatsOrdersDetailScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            // ---------------- HEADER ----------------
             Text(
                 text = "Orders placed from Jan–Dec",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
             )
 
-            // Toggle
+            // ---------------- TOGGLE ----------------
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Bar")
-                Switch(checked = isBar, onCheckedChange = { isBar = it })
-                Text("Line")
+                Text("Bar", style = MaterialTheme.typography.bodySmall)
+
+                ThinToggleSwitch(
+                    checked = showBar,
+                    onCheckedChange = { showBar = it },
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                )
+
+                Text("Line", style = MaterialTheme.typography.bodySmall)
             }
 
-            // Chart
+            // ---------------- CHART CARD ----------------
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(340.dp)
+                    .height(360.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                    )
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
             ) {
-                if (isBar)
+                if (showBar) {
                     YearlyBarChart(
                         data = yearlyOrders,
                         maxY = maxY,
                         modifier = Modifier.fillMaxSize()
                     )
-                else
+                } else {
                     YearlyLineChart(
                         data = yearlyOrders,
                         maxY = maxY,
                         modifier = Modifier.fillMaxSize()
                     )
+                }
             }
         }
     }
