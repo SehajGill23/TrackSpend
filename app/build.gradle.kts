@@ -91,5 +91,15 @@ dependencies {
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+
+    // Material 3 (core UI)
+    implementation("androidx.compose.material3:material3:1.3.0")
+
+    // Material Icons (default)
+    implementation("androidx.compose.material:material-icons-core:1.6.0")
+
+    // Material Symbols (NEW Google icon font —  ALL icons)
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
 }
 
