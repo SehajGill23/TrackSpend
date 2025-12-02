@@ -106,6 +106,7 @@ fun StatsScreen(
     val monthlySpent by viewModel.monthlySpent.collectAsState()
     val monthlyOrders by viewModel.monthlyOrders.collectAsState()
     val storeCounts by viewModel.monthlyOrdersByStore.collectAsState()
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
 
     val hasData = packages.isNotEmpty()
     val totalSpent = monthlySpent
@@ -168,7 +169,7 @@ fun StatsScreen(
                         )
                         Text(
                             text = if (hasData) "${(topStorePercent * 100).toInt()}%" else "0%",
-                            color = Color.White,
+                            color =  if (isDark) Color.White else PurpleBrand,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -187,7 +188,7 @@ fun StatsScreen(
                         Text("Stores: $totalStores")
 
                         if (hasData)
-                            Text("Top Store: $topStoreName", color = Color.LightGray)
+                            Text("Top Store: $topStoreName", color = if (isDark) Color.LightGray else PurpleBrand)
                     }
                 }
             }
@@ -205,7 +206,7 @@ fun StatsScreen(
                 Text("Monthly Spending", color = PurpleBrand, fontWeight = FontWeight.Bold)
 
                 if (!hasData) {
-                    Text("No Data", color = Color.LightGray)
+                    Text("No Data", color = if (isDark) Color.LightGray else Color.Gray)
                 } else {
                     YearlyLineChart(
                         data = viewModel.getYearlySpending(),
@@ -230,7 +231,7 @@ fun StatsScreen(
                 Text("Orders by Month", color = PurpleBrand, fontWeight = FontWeight.Bold)
 
                 if (!hasData) {
-                    Text("No Data", color = Color.LightGray)
+                    Text("No Data", color = if (isDark) Color.LightGray else Color.Gray)
                 } else {
                     YearlyBarChart(
                         data = viewModel.getYearlyOrders(),
@@ -238,7 +239,7 @@ fun StatsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(150.dp)
-                            .padding(top = 30.dp)
+                            .padding(top = 60.dp)
                     )
                 }
             }

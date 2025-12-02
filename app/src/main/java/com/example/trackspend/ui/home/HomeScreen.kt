@@ -55,9 +55,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.trackspend.R
 import com.example.trackspend.data.local.PackageEntity
 import com.example.trackspend.navigation.Routes
 import com.example.trackspend.viewmodel.PackageViewModel
@@ -106,12 +109,17 @@ fun HomeScreen(
             BottomSheetActions(
                 pkg = selectedPkg!!,
                 onEdit = {
+                    showSheet = false
+                    scope.launch { sheetState.hide() }
                     navController.navigate("edit/${selectedPkg!!.id}")
                 },
                 onDelete = {
+                    // open delete dialog
                     showDeleteDialog = true
                 },
                 onTogglePin = {
+                    showSheet = false
+                    scope.launch { sheetState.hide() }
                     viewModel.updatePinned(selectedPkg!!.id, !selectedPkg!!.isPinned)
                 }
             )
@@ -124,8 +132,15 @@ fun HomeScreen(
             onDismissRequest = { showDeleteDialog = false },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.deletePackage(selectedPkg!!)
+                    // CLOSE EVERYTHING FIRST
                     showDeleteDialog = false
+                    showSheet = false
+
+                    scope.launch {
+                        sheetState.hide() // hide the sheet
+                    }
+
+                    viewModel.deletePackage(selectedPkg!!)
                 }) {
                     Text("Delete")
                 }
@@ -442,16 +457,41 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
 
 @Composable
 fun EmptyState() {
+
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val PurpleBrand = Color(0xFF9B6DFF)
+
+    // Make sure you have a NavController instance available
+// val navController = ...
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(32.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            "No packages added yet.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        // A Column keeps the icon and text aligned and spaced nicely
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp) // Adds space between icon and text
+        ) {
+            // --- Text below the icon ---
+            Text(
+                text = "Add a package to start tracking.",
+                style = MaterialTheme.typography.titleLarge,
+                color = if (isDark) PurpleBrand.copy(alpha = 0.9f) else PurpleBrand.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center // Ensures text is centered if it wraps
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.arrow),
+                contentDescription = "Add Package",
+                tint = PurpleBrand,
+                modifier = Modifier.padding(start = 66.dp, top = 6.dp)
+                    .size(180.dp)
+            )
+
+        }
     }
 }
+    // Text Message
+

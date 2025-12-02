@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -54,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -102,9 +104,10 @@ fun PackageDetailScreen(
     LazyColumn(
         state = lazyListState,
         modifier = Modifier
+            .windowInsetsPadding(WindowInsets.navigationBars)
             .fillMaxSize()
             .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-            .padding(horizontal = 18.dp)
+            .padding(horizontal = 18.dp )
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top)),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
@@ -156,8 +159,8 @@ fun PackageDetailScreen(
                             // scroll to top immediately
                             lazyListState.animateScrollToItem(6)
 
-                            // show loader for 2 seconds
-                            delay(2000)
+                            // show loader for 1 seconds
+                            delay(1000)
 
                             // fetch new data
                             viewModel.refreshTracking(item)
@@ -202,18 +205,31 @@ fun PackageDetailScreen(
                 }
 
                 showTimeline -> {
-                    if (events.isEmpty()) {
+                    // 1. State to track if the delay has finished
+                    var showMessage by remember { mutableStateOf(false) }
+
+                    // 2. Start a timer when this block enters composition
+                    LaunchedEffect(Unit) {
+                        // Only wait if events are actually empty
+                        if (events.isEmpty()) {
+                            delay(2000) // Wait 2 seconds
+                            showMessage = true
+                        }
+                    }
+
+                    if (events.isNotEmpty()) {
+                        // If we have events, show them immediately
+                        TrackingTimeline(events)
+                    } else if (showMessage) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             Text("No tracking found.")
                         }
-                    } else {
-                        TrackingTimeline(events)
                     }
-
                 }
+
             }
         }
 
@@ -247,79 +263,132 @@ fun PackageDetailScreen(
 
 @Composable
 fun MainInfoCard(pkg: PackageEntity) {
-    val Purple = Color(0xFF9B6DFF)
-    val DarkPurple = Color(0xFF140028)
-    val Border = Color.White.copy(alpha = 0.14f)
 
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val purple = Color(0xFF9B6DFF)
+
+    val bg = if (isDark) Color(0xFF140028) else Color(0xFFF3E9FF)
+    val border = if (isDark) Color.White.copy(alpha = 0.14f) else Color.Black.copy(alpha = 0.12f)
+    val labelColor = if (isDark) Color(0xFFDBC8FF) else Color(0xFF4C2A8A)
+    val textColor = if (isDark) Color.White else Color(0xFF1A1A1A)
+
+    // Whole outer glow container
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 18.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Purple.copy(alpha = 0.9f),
-                spotColor = Purple.copy(alpha = 0.9f)
+                22.dp,
+                RoundedCornerShape(20.dp),
+                ambientColor = purple.copy(alpha = if (isDark) 0.9f else 0.55f),
+                spotColor = purple.copy(alpha = if (isDark) 0.9f else 0.55f)
             ),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = DarkPurple),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Border),
+        shape = RoundedCornerShape(20.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, border),
+        colors = CardDefaults.cardColors(containerColor = bg),
         elevation = CardDefaults.cardElevation(0.dp)
     ) {
+
         Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(26.dp)
         ) {
-            RowWithCustomIcon(R.drawable.barcode, "Tracking Number", pkg.trackingNumber)
-            RowWithIcon(Icons.Default.LocalShipping, "Carrier", pkg.carrier)
-            RowWithIcon(Icons.Default.ShoppingBag, "Item", pkg.itemName ?: "N/A")
-            RowWithIcon(Icons.Default.Store, "Store", pkg.store ?: "N/A")
-            RowWithIcon(Icons.Default.AttachMoney, "Price", pkg.price?.let { "$$it" } ?: "N/A")
-            RowWithIcon(Icons.Default.CalendarMonth, "Order Date", pkg.orderDate ?: "N/A")
-            RowWithIcon(Icons.Default.Info, "Status", pkg.status)
+
+            // ---------------- PACKAGE INFO SECTION ----------------
+            SectionHeader("Package Info", purple)
+
+            InfoRow(
+                R.drawable.barcode,
+                "Tracking Number",
+                pkg.trackingNumber,
+                labelColor,
+                textColor
+            )
+            InfoRow(Icons.Default.LocalShipping, "Carrier", pkg.carrier, labelColor, textColor)
+            InfoRow(Icons.Default.Info, "Status", pkg.status, labelColor, textColor)
+
+            // ---------------- PURCHASE INFO SECTION ----------------
+            SectionHeader("Purchase Details", purple)
+
+            InfoRow(Icons.Default.ShoppingBag, "Item", pkg.itemName ?: "N/A", labelColor, textColor)
+            InfoRow(Icons.Default.Store, "Store", pkg.store ?: "N/A", labelColor, textColor)
+            InfoRow(Icons.Default.AttachMoney, "Price", pkg.price?.let { "$$it" } ?: "N/A", labelColor, textColor)
+            InfoRow(Icons.Default.CalendarMonth, "Order Date", pkg.orderDate ?: "N/A", labelColor, textColor)
         }
     }
 }
 
-@Composable
-fun RowWithIcon(icon: ImageVector, label: String, value: String) {
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null, tint = Color(0xFF9B6DFF), modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(8.dp))
-            Text(label, fontWeight = FontWeight.SemiBold, color = Color.White)
-        }
-        Text(value, color = Color.White)
-        Spacer(modifier = Modifier.height(8.dp))
-    }
-}
 
 @Composable
-fun RowWithCustomIcon(
-    iconRes: Int,
+private fun SectionHeader(title: String, color: Color) {
+    Text(
+        text = title,
+        color = color,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = 2.dp)
+    )
+}
+
+
+
+@Composable
+private fun InfoRow(
+    icon: ImageVector,
     label: String,
-    value: String
+    value: String,
+    labelColor: Color,
+    textColor: Color
 ) {
-    Column {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                painterResource(id = iconRes),
+                imageVector = icon,
                 contentDescription = null,
-                tint = Color(0xFF9B6DFF),
+                tint = labelColor,
                 modifier = Modifier.size(20.dp)
             )
-            Spacer(Modifier.width(8.dp))
-            Text(label, fontWeight = FontWeight.SemiBold, color = Color.White)
+            Spacer(Modifier.width(10.dp))
+            Text(label, fontWeight = FontWeight.SemiBold, color = labelColor)
         }
-        Text(value, color = Color.White)
-        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            value,
+            color = textColor,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(start = 30.dp)
+        )
     }
 }
 
+
 @Composable
-fun DetailRow(label: String, value: String) {
-    Column {
-        Text(label, fontWeight = FontWeight.SemiBold)
-        Text(value)
-        Spacer(modifier = Modifier.height(8.dp))
+fun InfoRow(
+    iconRes: Int,
+    label: String,
+    value: String,
+    labelColor: Color,
+    textColor: Color
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(id = iconRes),
+                contentDescription = null,
+                tint = labelColor,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(label, fontWeight = FontWeight.SemiBold, color = labelColor)
+        }
+
+        Text(
+            value,
+            color = textColor,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(start = 30.dp)
+        )
     }
 }
+
