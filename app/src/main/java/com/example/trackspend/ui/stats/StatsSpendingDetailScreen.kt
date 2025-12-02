@@ -36,6 +36,45 @@ import com.example.trackspend.ui.stats.components.YearlyBarChart
 import com.example.trackspend.ui.stats.components.YearlyLineChart
 import com.example.trackspend.viewmodel.PackageViewModel
 
+
+/**
+ * Screen displaying a detailed breakdown of the user's yearly spending
+ * (January through December). The user can switch between a line chart and
+ * a bar chart representation using a thin custom toggle switch.
+ *
+ * <p><b>Features:</b></p>
+ * <ul>
+ *   <li><b>Interactive Chart Toggle:</b> A ThinToggleSwitch lets the user
+ *       instantly switch between a smooth line graph or bar visualization.</li>
+ *   <li><b>YearlyLineChart:</b> Displays spending trends with a gradient
+ *       under-fill, grid lines, and data point markers.</li>
+ *   <li><b>YearlyBarChart:</b> Simple month-by-month bar visualization with
+ *       rounded bars and axis labels.</li>
+ *   <li><b>Auto-Adjusted Scaling:</b> The maximum Y-axis is increased by 30%
+ *       to give breathing room above the highest value.</li>
+ *   <li><b>Material You integration:</b> Uses theme-driven colors, modern
+ *       padding, elevations, and rounded 22dp card styling.</li>
+ *   <li><b>Back Navigation:</b> TopAppBar back arrow pops the navigation stack.</li>
+ * </ul>
+ *
+ * <p><b>Data sources:</b></p>
+ * <ul>
+ *   <li>{@link PackageViewModel#getYearlySpending()} — provides 12 values
+ *       representing the total spending for each month.</li>
+ *   <li>The chart entirely recomposes when toggle state changes.</li>
+ * </ul>
+ *
+ * <p><b>UI layout:</b></p>
+ * <ol>
+ *   <li>TopAppBar with back arrow</li>
+ *   <li>Large rounded card container</li>
+ *   <li>Header row with title + chart type toggle</li>
+ *   <li>Chart box that fills the card space (line or bar)</li>
+ * </ol>
+ *
+ * @param navController Used to navigate back to the main stats screen.
+ * @param viewModel Provides monthly aggregated spending data for the chart.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

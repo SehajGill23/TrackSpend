@@ -6,8 +6,30 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
+/**
+ * Defines the text styles used throughout the TrackSpend app.
+ *
+ * <p>This typography configuration customizes Material3's default text system.
+ * Currently, only the `bodyLarge` style is overridden, while other text styles
+ * fall back to Material defaults unless explicitly added.</p>
+ *
+ * <p>You can extend this typography setup later by overriding styles such as
+ * `titleLarge`, `headlineMedium`, or `labelSmall` to better match the app's
+ * branding and visual identity.</p>
+ *
+ * @see androidx.compose.material3.Typography
+ */
 val Typography = Typography(
+
+    /**
+     * Base body text style used across most screens.
+     *
+     * <p>Provides comfortable readability with a 16sp font size, 24sp line height,
+     * and slight letter spacing for cleaner text rendering.</p>
+     *
+     * <p>This style is applied to general content text, labels, and descriptions
+     * unless a more specific style is requested.</p>
+     */
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,

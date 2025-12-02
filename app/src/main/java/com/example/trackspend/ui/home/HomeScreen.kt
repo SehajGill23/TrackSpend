@@ -66,6 +66,21 @@ import com.example.trackspend.navigation.Routes
 import com.example.trackspend.viewmodel.PackageViewModel
 import kotlinx.coroutines.launch
 
+
+/**
+ * Main home dashboard of the app.
+ *
+ * Responsibilities:
+ *  - Displays all tracked packages (sorted + searchable)
+ *  - Handles search filtering on tracking number, carrier, item, store
+ *  - Shows modern aesthetic package cards
+ *  - Supports long-press gestures → opens bottom sheet actions
+ *  - Supports delete confirmation dialog
+ *  - Navigates to package details or edit screen
+ *
+ * @param viewModel shared PackageViewModel providing package list
+ * @param navController navigation controller for routing
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -200,6 +215,12 @@ fun HomeScreen(
     }
 }
 
+
+/**
+ * Top app bar for the home screen.
+ *
+ * Shows the “TrackSpend” title using brand styling.
+ */
 @Composable
 fun TrackSpendTopBar() {
     val PurpleBrand = Color(0xFF9B6DFF)
@@ -216,9 +237,22 @@ fun TrackSpendTopBar() {
     )
 }
 
-/* ---------------------------------------------------------
-   MODERN PACKAGE CARD — CLEAN, PROFESSIONAL, AESTHETIC
- --------------------------------------------------------- */
+/**
+ * Single package card displayed in the list.
+ *
+ * Design:
+ *  - Glassy card with purple glow
+ *  - Shows carrier, item name, tracking number, date, price
+ *  - Displays pin icon if pinned
+ *
+ * Interactions:
+ *  - onClick → opens package details
+ *  - onLongPress → opens bottom sheet actions
+ *
+ * @param pkg package data to display
+ * @param onClick callback for normal tap
+ * @param onLongPress callback for long press
+ */
 @Composable
 fun ModernPackageCard(
     pkg: PackageEntity,
@@ -366,9 +400,19 @@ fun ModernPackageCard(
     }
 }
 
-/* ---------------------------------------------------------
-   BOTTOM SHEET ACTIONS — CLEANER & MODERN
- --------------------------------------------------------- */
+/**
+ * Bottom sheet displaying actions for a selected package:
+ *  - Edit
+ *  - Delete
+ *  - Pin / Unpin
+ *
+ * This appears when a package card is long-pressed.
+ *
+ * @param pkg selected package
+ * @param onEdit callback when user taps Edit
+ * @param onDelete callback when user taps Delete
+ * @param onTogglePin callback for toggling pinned state
+ */
 @Composable
 fun BottomSheetActions(
     pkg: PackageEntity,
@@ -394,6 +438,13 @@ fun BottomSheetActions(
     }
 }
 
+/**
+ * Single row inside the bottom sheet action list.
+ *
+ * @param icon row icon
+ * @param text action label
+ * @param action callback when row is tapped
+ */
 @Composable
 fun SheetRow(icon: ImageVector, text: String, action: () -> Unit) {
     Row(
@@ -409,9 +460,17 @@ fun SheetRow(icon: ImageVector, text: String, action: () -> Unit) {
     }
 }
 
-/* ---------------------------------------------------------
-   SEARCH BAR — Cleaner & more modern
- --------------------------------------------------------- */
+/**
+ * Search bar used to filter packages on the home screen.
+ *
+ * Features:
+ *  - Purple-glow container
+ *  - Keyword filtering across tracking number, carrier, item, store
+ *  - Works in dark & light mode
+ *
+ * @param query current search text
+ * @param onQueryChange invoked when user types into field
+ */
 @Composable
 fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
     val PurpleBrand = Color(0xFF9B6DFF)
@@ -455,6 +514,16 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
     }
 }
 
+
+/**
+ * Displayed when the user has no packages saved.
+ *
+ * Shows:
+ *  - a friendly message encouraging user to add a package
+ *  - an arrow pointing to the Add button
+ *
+ * Adaptive for dark/light mode.
+ */
 @Composable
 fun EmptyState() {
 
@@ -493,5 +562,4 @@ fun EmptyState() {
         }
     }
 }
-    // Text Message
 

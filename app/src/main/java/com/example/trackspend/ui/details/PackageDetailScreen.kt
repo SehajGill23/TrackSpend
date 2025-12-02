@@ -71,6 +71,25 @@ import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
+/**
+ * Full package detail screen showing:
+ *  - package info (tracking, carrier, item, store, price, date)
+ *  - edit + delete actions
+ *  - tracking refresh button
+ *  - dynamic timeline with loader + “no tracking found”
+ *
+ * Behavior:
+ *  - Observes live database entry using ViewModel
+ *  - Decodes saved timeline JSON into model objects
+ *  - Calls 17Track API via ViewModel when “Track Package” is tapped
+ *  - Handles “No Internet” gracefully by showing a neutral message
+ *  - Uses LazyColumn for scrollable sections
+ *
+ * @param id package ID from navigation
+ * @param viewModel shared PackageViewModel
+ * @param navController navigation controller
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PackageDetailScreen(
@@ -153,7 +172,6 @@ fun PackageDetailScreen(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        
                         val hasNet = hasInternet(navController.context)
 
                         if (!hasNet) {
@@ -280,6 +298,21 @@ fun PackageDetailScreen(
     }
 }
 
+
+/**
+ * Main top card containing:
+ *  - Tracking Number
+ *  - Carrier
+ *  - Status
+ *  - Item, Store, Price, Order Date
+ *
+ * Features:
+ *  - Dark/light mode adaptive colors
+ *  - Purple glow shadow
+ *  - Two info sections ("Package Info" + "Purchase Details")
+ *
+ * @param pkg the Room entity representing the package
+ */
 @Composable
 fun MainInfoCard(pkg: PackageEntity) {
 
@@ -337,6 +370,12 @@ fun MainInfoCard(pkg: PackageEntity) {
 }
 
 
+/**
+ * Simple reusable section header used inside the details card.
+ *
+ * @param title label such as "Package Info" or "Purchase Details"
+ * @param color accent color for text
+ */
 @Composable
 private fun SectionHeader(title: String, color: Color) {
     Text(
@@ -349,7 +388,20 @@ private fun SectionHeader(title: String, color: Color) {
 }
 
 
-
+/**
+ * Info row that uses an ImageVector icon.
+ *
+ * Used for:
+ *  - Carrier (LocalShipping)
+ *  - Status (Info)
+ *  - Item, Store, Price, Date
+ *
+ * @param icon vector icon
+ * @param label row label
+ * @param value row value
+ * @param labelColor color for labels + icons
+ * @param textColor color for value text
+ */
 @Composable
 private fun InfoRow(
     icon: ImageVector,
@@ -380,7 +432,18 @@ private fun InfoRow(
     }
 }
 
-
+/**
+ * Info row that uses a drawable resource icon.
+ *
+ * Used specifically for:
+ *  - Tracking Number (barcode drawable)
+ *
+ * @param iconRes drawable resource ID
+ * @param label row label
+ * @param value row value
+ * @param labelColor color for labels + icons
+ * @param textColor color for the value text
+ */
 @Composable
 fun InfoRow(
     iconRes: Int,

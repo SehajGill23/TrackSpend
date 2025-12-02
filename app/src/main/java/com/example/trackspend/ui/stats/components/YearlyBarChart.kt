@@ -16,6 +16,20 @@ private val monthLabels = listOf(
     "JUL","AUG","SEP","OCT","NOV","DEC"
 )
 
+
+/**
+ * A fully custom yearly bar chart drawn on a Canvas.
+ *
+ * Features:
+ *  - 12-month bar visualization (JAN–DEC)
+ *  - Dynamic scaling based on `maxY`
+ *  - Auto-generated grid lines + Y-axis labels
+ *  - Rounded bars + Material color integration
+ *
+ * @param data list of 12 Float values representing monthly totals
+ * @param maxY the highest possible Y value (defines chart scale)
+ * @param modifier layout modifier for sizing or padding
+ */
 @Composable
 fun YearlyBarChart(
     data: List<Float>,

@@ -1,8 +1,12 @@
 package com.example.trackspend.navigation
 
 /**
- * Route names for navigation throughout the app.
- * Keeping them here avoids typos and makes the NavHost cleaner.
+ * Centralized navigation route definitions used across the app.
+ *
+ * Storing all route strings in one object prevents spelling mistakes,
+ * keeps NavHost setup consistent, and makes it easy to update or add routes.
+ *
+ * Each constant corresponds to a destination composable in the navigation graph.
  */
 object Routes {
     const val HOME = "home"

@@ -21,6 +21,22 @@ import com.example.trackspend.ui.stats.StatsSummaryDetailScreen
 import com.example.trackspend.viewmodel.PackageViewModel
 import com.example.trackspend.viewmodel.PackageViewModelFactory
 
+/**
+ * Central navigation graph for the entire application.
+ *
+ * This NavHost wires every screen together:
+ *  - Home
+ *  - Add Package
+ *  - Package Details
+ *  - Edit Package
+ *  - Analytics + all sub-screens
+ *
+ * It also provides the shared `PackageViewModel` instance so every screen
+ * interacts with the same data source (Room database + tracking API).
+ *
+ * @param navController The NavController used to navigate between screens.
+ * @param modifier Optional layout modifier for the NavHost container.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(

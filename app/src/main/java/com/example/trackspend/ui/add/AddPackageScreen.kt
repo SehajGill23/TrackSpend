@@ -77,9 +77,15 @@ private val GlassBorderLight = Color.Black.copy(alpha = 0.10f)
 private val ErrorRed = Color(0xFFFF3B3B)
 
 
-// ------------------------------------------------------
-// GlowCard — universal glass/glow container
-// ------------------------------------------------------
+/**
+ * Reusable UI component that renders a glowing, glass-style card container.
+ *
+ * This is used across multiple screens to maintain visual consistency.
+ * It:
+ *  - applies a purple glow shadow,
+ *  - adapts background and border based on light/dark theme,
+ *  - wraps any provided Composable content.
+ */
 @Composable
 fun GlowCard(
     modifier: Modifier = Modifier,
@@ -124,9 +130,18 @@ fun GlowCard(
 }
 
 
-// ------------------------------------------------------
-// FULL SCREEN
-// ------------------------------------------------------
+/**
+ * Main screen for adding a new package manually or via Smart Email Import.
+ *
+ * Features:
+ *  - Smart Import section that auto-extracts fields using EmailParser
+ *  - Manual input fields for all package data (tracking, carrier, store, etc.)
+ *  - Real-time validation for tracking number, carrier, date format
+ *  - Saves package to Room database using the provided onSave callback
+ *
+ * @param navController Navigation controller for screen transitions
+ * @param onSave Callback executed after user submits valid package data
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -182,7 +197,12 @@ fun AddPackageScreen(
     )
 
 
-    // Helpers
+    /**
+     * Formats raw numeric input into YYYY-MM-DD as the user types.
+     *
+     * Accepts digits only and gradually inserts dashes.
+     * Example: 202412 -> "2024-12"
+     */
     fun formatDate(raw: String): String {
         val digits = raw.filter { it.isDigit() }
         return when {
@@ -193,6 +213,10 @@ fun AddPackageScreen(
         }
     }
 
+    /**
+     * Validates whether the formatted date string follows YYYY-MM-DD
+     * and represents an actual valid calendar date.
+     */
     fun isValidDate(f: String): Boolean =
         try { f.length == 10 && LocalDate.parse(f) != null } catch(e:Exception){ false }
 
@@ -240,6 +264,12 @@ fun AddPackageScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                /**
+                 * Triggers Smart Email Import:
+                 *  - Shows loading indicator
+                 *  - Parses email text using EmailParser
+                 *  - Autofills recognized fields (tracking, carrier, store, price, date)
+                 */
                 Button(
                     onClick = {
                         isLoading = true
@@ -277,6 +307,12 @@ fun AddPackageScreen(
             GlowCard {
                 Text("Package Details", style = MaterialTheme.typography.titleMedium)
 
+                /**
+                 * Tracking number field logic:
+                 *  - Allows alphanumeric only
+                 *  - Max length enforced (50 chars)
+                 *  - Automatically clears error if user types valid content
+                 */
                 OutlinedTextField(
                     value = trackingNumber,
                     shape = RoundedCornerShape(16.dp),
@@ -325,10 +361,22 @@ fun AddPackageScreen(
 
                 var expanded by remember { mutableStateOf(false) }
 
+
+                /**
+                 * Carrier selection dropdown using Material3 ExposedDropdownMenu.
+                 *
+                 * Error styling is applied if user tries to submit an empty carrier.
+                 * If "Other" is selected, a custom carrier field appears.
+                 */
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded }
                 ) {
+
+                    /**
+                     * Text field displayed only when user selects "Other" carrier.
+                     * Allows custom carrier name input.
+                     */
                     OutlinedTextField(
                         value = carrier,
                         readOnly = true,
@@ -396,6 +444,7 @@ fun AddPackageScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
+
 
                 OutlinedTextField(
                     value = store,

@@ -17,6 +17,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+
+/**
+ * A minimal, modern thin toggle switch used in stats filters.
+ *
+ * Behaviors:
+ *  - Smooth thumb animation using `animateDpAsState`
+ *  - Clickable track that flips the boolean state
+ *  - Compact “thin” design (smaller than a standard switch)
+ *
+ * @param checked current switch state
+ * @param onCheckedChange callback invoked when the user toggles the switch
+ * @param modifier optional layout modifier
+ */
 @Composable
 fun ThinToggleSwitch(
     checked: Boolean,
@@ -24,8 +37,8 @@ fun ThinToggleSwitch(
     modifier: Modifier = Modifier
 ) {
     val trackWidth = 38.dp
-    val trackHeight = 18.dp  // 🔥 THIN
-    val thumbSize = 14.dp    // 🔥 SMALL
+    val trackHeight = 18.dp  //  THIN
+    val thumbSize = 14.dp    //  SMALL
 
     val offset by animateDpAsState(
         targetValue = if (checked) (trackWidth - thumbSize - 4.dp) else 4.dp

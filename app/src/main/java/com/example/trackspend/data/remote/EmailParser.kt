@@ -1,6 +1,5 @@
 package com.example.trackspend.data.remote
 
-import android.R.attr.text
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -8,17 +7,22 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 /**
- * Smart hybrid email parser:
+ * EmailParser performs intelligent extraction of order information
+ * from raw email text. This acts as the "auto-fill brain" for the
+ * Add Package screen.
  *
- * Extracts:
- *  - tracking number
- *  - carrier
- *  - store (from domain + text)
- *  - price (grand total / total / paid)
- *  - order date
- *  - item name (keyword-based)
+ * Responsibilities:
+ *  - Detect tracking number using multiple carrier-specific patterns
+ *  - Identify carrier using tracking patterns, keywords, or store fallback
+ *  - Find store from sender domain or email body match
+ *  - Extract price using flexible regex patterns
+ *  - Detect order date in multiple formats and normalize it
+ *  - Pull item name from product-related keywords
  *
- * Goal: Autofill Add Package screen with minimal errors.
+ * This parser is intentionally fault-tolerant and aims for the
+ * “best possible guess” instead of perfect accuracy.
+ *
+ * All parsing is done offline — no network calls.
  */
 object EmailParser {
 
@@ -29,9 +33,21 @@ object EmailParser {
         "Royal Mail", "Hermes", "DPD", "GLS"
     )
 
-    // ============================================================
-    // MAIN PARSE FUNCTION
-    // ============================================================
+    /**
+     * Main entry point for parsing an email.
+     *
+     * Orchestrates all sub-parsers to extract:
+     *  - tracking number
+     *  - carrier
+     *  - store (domain or body)
+     *  - price
+     *  - order date
+     *  - item name
+     *
+     * @param context used to load the store list
+     * @param rawEmail full email body and header text
+     * @return ParsedEmailInfo containing all extracted fields
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     fun parse(context: Context, rawEmail: String): ParsedEmailInfo {
         if (rawEmail.isBlank()) return ParsedEmailInfo()
@@ -63,38 +79,109 @@ object EmailParser {
         )
     }
 
-    // ============================================================
-    // SENDER DOMAIN
-    // ============================================================
+    /**
+     * Extracts the sender's domain from the email header section.
+     *
+     * Example:
+     *   "order@nike.com" → "nike.com"
+     *
+     * @return domain string or null if none found
+     */
     private fun extractSenderDomain(text: String): String? {
         val regex = Regex("""[A-Za-z0-9._%+-]+@([A-Za-z0-9.-]+\.[A-Za-z]{2,})""")
         return regex.find(text)?.groupValues?.get(1)
     }
 
-    // ============================================================
-    // STORE DETECTION — FROM DOMAIN
-    // ============================================================
+    /**
+     * Maps a sender domain to a known store (e.g., nike.com → nike).
+     *
+     * @param domain sender domain (may be null)
+     * @return store name or null if the domain does not match any known store
+     */
     private fun detectStoreFromDomain(domain: String?): String? {
         val d = domain?.lowercase() ?: return null
         return when {
+            // Tech & Electronics
             "amazon" in d -> "Amazon"
-            "bestbuy" in d -> "Best Buy"
-            "walmart" in d -> "Walmart"
-            "ebay" in d -> "eBay"
-            "etsy" in d -> "Etsy"
-            "aliexpress" in d -> "AliExpress"
             "apple" in d -> "Apple"
+            "bestbuy" in d || "best buy" in d -> "Best Buy"
+            "microsoft" in d -> "Microsoft"
+            "samsung" in d -> "Samsung"
+            "newegg" in d -> "Newegg"
+            "bhphotovideo" in d || "b&h" in d -> "B&H Photo"
+            "dell" in d -> "Dell"
+            "hp store" in d -> "HP"
+
+            // General Retail & Department Stores
+            "walmart" in d -> "Walmart"
+            "target" in d -> "Target"
+            "costco" in d -> "Costco"
+            "ebay" in d -> "eBay"
+            "aliexpress" in d -> "AliExpress"
+            "temu" in d -> "Temu"
+            "dhgate" in d -> "DHGate"
+            "rakuten" in d -> "Rakuten"
+            "macys" in d || "macy's" in d -> "Macy's"
+            "nordstrom" in d -> "Nordstrom"
+            "kohls" in d || "kohl's" in d -> "Kohl's"
+            "bloomingdales" in d -> "Bloomingdale's"
+
+            // Fashion & Apparel
             "nike" in d -> "Nike"
             "adidas" in d -> "Adidas"
             "shein" in d -> "Shein"
-            "ikea" in d -> "Ikea"
+            "zara" in d -> "Zara"
+            "h&m" in d || "h & m" in d -> "H&M"
+            "uniqlo" in d -> "Uniqlo"
+            "asos" in d -> "ASOS"
+            "lululemon" in d -> "Lululemon"
+            "gucci" in d -> "Gucci"
+            "louis vuitton" in d -> "Louis Vuitton"
+            "victoria" in d && "secret" in d -> "Victoria's Secret"
+            "gap" in d -> "Gap"
+            "old navy" in d -> "Old Navy"
+            "levi" in d -> "Levi's"
+            "urban outfitters" in d -> "Urban Outfitters"
+            "ssense" in d -> "SSENSE"
+            "farfetch" in d -> "Farfetch"
+
+            // Home & Furniture
+            "ikea" in d -> "IKEA"
+            "wayfair" in d -> "Wayfair"
+            "home depot" in d -> "The Home Depot"
+            "lowes" in d || "lowe's" in d -> "Lowe's"
+            "pottery barn" in d -> "Pottery Barn"
+            "west elm" in d -> "West Elm"
+            "crate" in d && "barrel" in d -> "Crate & Barrel"
+            "williams sonoma" in d -> "Williams Sonoma"
+
+            // Beauty & Health
+            "sephora" in d -> "Sephora"
+            "ulta" in d -> "Ulta Beauty"
+            "bath" in d && "body" in d -> "Bath & Body Works"
+            "iherb" in d -> "iHerb"
+            "glossier" in d -> "Glossier"
+
+            // Handmade & Niche
+            "etsy" in d -> "Etsy"
+            "redbubble" in d -> "Redbubble"
+            "stockx" in d -> "StockX"
+            "chewy" in d -> "Chewy" // Pet supplies
+            "petco" in d -> "Petco"
+            "petsmart" in d -> "PetSmart"
+
             else -> null
         }
     }
 
-    // ============================================================
-    // STORE DETECTION — FROM BODY
-    // ============================================================
+    /**
+     * Searches the email text for a store name by scanning the body
+     * against a preloaded store list.
+     *
+     * @param text entire email body in lowercase
+     * @param stores list of known store names loaded from assets
+     * @return detected store or null
+     */
     private fun detectStoreFromBody(text: String, stores: List<String>): String? {
         val lower = text.lowercase()
         return stores.firstOrNull { store ->
@@ -103,9 +190,14 @@ object EmailParser {
         }
     }
 
-    // ============================================================
-    // TRACKING EXTRACTION
-    // ============================================================
+    /**
+     * Extracts a tracking number using a series of carrier-specific
+     * regex patterns (UPS, FedEx, USPS, DHL, Canada Post, Amazon Logistics).
+     *
+     * Cleans formatting (spaces, dashes) before scanning.
+     *
+     * @return first valid tracking number found or null
+     */
     private fun extractTracking(text: String): String? {
         val cleaned = text.replace("\n", "").replace("-", "").replace(" ", "")
 
@@ -130,9 +222,16 @@ object EmailParser {
 
     }
 
-    // ============================================================
-    // PRICE EXTRACTION
-    // ============================================================
+    /**
+     * Attempts to extract the order price by scanning for common
+     * money patterns such as:
+     *   - "Grand Total: $XX.XX"
+     *   - "Paid: $XX.XX"
+     *   - "$ XX.XX"
+     *
+     * @param text normalized lowercase email body
+     * @return extracted price as Double or null
+     */
     private fun extractPrice(text: String): Double? {
         val lower = text.lowercase()
 
@@ -153,10 +252,19 @@ object EmailParser {
 
         return null
     }
-
-    // ============================================================
-    // CARRIER DETECTION
-    // ============================================================
+    /**
+     * Determines the carrier using:
+     *  1. tracking number structure
+     *  2. fallback: store name inference
+     *
+     * Example:
+     *   "1Z..." → UPS
+     *   "TBA..." → Amazon Logistics
+     *
+     * @param tracking cleaned tracking number candidate
+     * @param store optional detected store
+     * @return carrier name or "Unknown"
+     */
     private fun detectCarrier(tracking: String?, store: String?): String? {
         tracking ?: return null
         val code = tracking.uppercase()
@@ -191,7 +299,12 @@ object EmailParser {
         }
     }
 
-
+    /**
+     * Scans the email text for direct carrier mentions,
+     * such as "FedEx", "UPS", "USPS", etc.
+     *
+     * @return carrier name if mentioned in the body, otherwise null
+     */
     private fun extractCarrierFromBody(text: String): String? {
         val carriers = listOf(
             "FedEx", "FedEx Ground", "FedEx Express",
@@ -208,9 +321,18 @@ object EmailParser {
     }
 
 
-    // ============================================================
-    // ORDER DATE EXTRACTION
-    // ============================================================
+    /**
+     * Attempts to locate an "order date" using a list of
+     * keywords and multiple date formats.
+     *
+     * Accepts styles like:
+     *   - December 5, 2024
+     *   - Dec 5 2024
+     *   - 2024-12-05
+     *   - 12/05/2024
+     *
+     * @return normalized ISO date (YYYY-MM-DD) or null
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun extractOrderDate(text: String): String? {
         val lower = text.lowercase()
@@ -241,6 +363,14 @@ object EmailParser {
         return null
     }
 
+    /**
+     * Converts different date formats into a unified "YYYY-MM-DD" format.
+     *
+     * Strips suffixes (st, nd, rd, th) and parses with a set of formats.
+     *
+     * @param raw the date found in text
+     * @return normalized ISO date or null if no format matched
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun normalizeDate(raw: String): String? {
         val cleaned = raw
@@ -270,9 +400,17 @@ object EmailParser {
         return null
     }
 
-    // ============================================================
-    // ITEM NAME EXTRACTION
-    // ============================================================
+    /**
+     * Attempts to extract the item name using product-related keywords
+     * such as:
+     *   - "Item:"
+     *   - "Product:"
+     *   - "Description:"
+     *
+     * Filters out invalid matches (store names, carriers, numbers only).
+     *
+     * @return a reasonable guess for the item name or null
+     */
     private fun extractItemName(text: String, storeList: List<String>): String? {
         val lines = text.split("\n")
 

@@ -42,6 +42,18 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
+/**
+ * Renders the full vertical tracking history for a package.
+ *
+ * The list is:
+ *  - sorted by newest event first,
+ *  - displayed as a vertical timeline using TimelineView,
+ *  - each event rendered inside a styled card.
+ *
+ * @param events List of tracking events to display
+ * @param modifier Optional layout modifier
+ */
 @Composable
 fun TrackingTimeline(
     events: List<TrackingEvent>,
@@ -57,6 +69,23 @@ fun TrackingTimeline(
     }
 }
 
+
+/**
+ * Renders a single timeline event row:
+ *
+ * Structure:
+ *  - Left: timeline marker + connecting line (TimelineView)
+ *  - Right: glow card showing time, date, status, and location
+ *
+ * Visual Features:
+ *  - Delivered events use green theme (parrot green in light mode)
+ *  - Other events use purple brand colors
+ *  - Dynamically adapts to dark/light mode
+ *
+ * @param event Single tracking event
+ * @param index Position in the list (needed for timeline line type)
+ * @param total Total number of events
+ */
 @Composable
 private fun TimelineEventCard(event: TrackingEvent, index: Int, total: Int) {
 
@@ -64,7 +93,7 @@ private fun TimelineEventCard(event: TrackingEvent, index: Int, total: Int) {
     val isDelivered = event.status.contains("delivered", ignoreCase = true)
 
     // --- ORIGINAL DARK-MODE COLORS EXACTLY AS YOU HAD ---
-// --- ORIGINAL DARK-MODE COLORS EXACTLY AS YOU HAD ---
+    // --- ORIGINAL DARK-MODE COLORS EXACTLY AS YOU HAD ---
     val cardBg =
         if (isDelivered) {
             if (isDark) Color(0xFF0E2F0E)     // DARK MODE delivered
@@ -234,6 +263,13 @@ private fun TimelineEventCard(event: TrackingEvent, index: Int, total: Int) {
     }
 }
 
+
+/**
+ * Attempts to extract a postal code from an event's location field.
+ *
+ * Expected format: "City, PostalCode"
+ * Returns null if no comma or postal code found.
+ */
 private fun extractPostalCode(location: String?): String? {
     return location
         ?.takeIf { it.contains(",") }
@@ -241,8 +277,17 @@ private fun extractPostalCode(location: String?): String? {
         ?.trim()
 }
 
+
+/**
+ * Converts a Unix timestamp (ms) into a user-friendly time string.
+ * Example: "3:42 PM"
+ */
 private fun Long.toDateStringTimeOnly(): String =
     SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(this))
 
+/**
+ * Converts a Unix timestamp (ms) into a date string.
+ * Example: "12 Feb 2025"
+ */
 private fun Long.toDateStringDateOnly(): String =
     SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(this))

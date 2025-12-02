@@ -36,6 +36,47 @@ import com.example.trackspend.ui.stats.components.YearlyBarChart
 import com.example.trackspend.ui.stats.components.YearlyLineChart
 import com.example.trackspend.viewmodel.PackageViewModel
 
+
+/**
+ * Detailed analytics screen showing the user's total orders across all
+ * twelve months of the year. This screen allows switching between a bar
+ * chart and a line chart visualization using a thin toggle switch.
+ *
+ * <p>Features:</p>
+ * <ul>
+ *   <li><b>Bar / Line Toggle:</b> A custom ThinToggleSwitch lets the user
+ *       dynamically switch between two chart types.</li>
+ *   <li><b>YearlyBarChart:</b> Displays monthly order counts as bars with
+ *       rounded corners and axis labels.</li>
+ *   <li><b>YearlyLineChart:</b> Smooth line graph with gradient fill and
+ *       data points representing each month.</li>
+ *   <li><b>Auto-Scaling Y-Axis:</b> The maximum Y value is increased by 30%
+ *       for visual spacing above the highest data point.</li>
+ *   <li><b>Consistent Material You styling:</b> Uses the app theme for
+ *       colors, surface backgrounds, and typography.</li>
+ *   <li><b>Back Navigation:</b> TopAppBar includes a back arrow that pops
+ *       the NavController stack.</li>
+ * </ul>
+ *
+ * <p>State & Behavior:</p>
+ * <ul>
+ *   <li>The chart type is controlled via a boolean state (showBar).</li>
+ *   <li>Data is retrieved using {@link PackageViewModel#getYearlyOrders()}.</li>
+ *   <li>The chart container uses rounded corners and a dimmed
+ *       surfaceVariant background for clarity.</li>
+ * </ul>
+ *
+ * <p>UI Structure:</p>
+ * <ol>
+ *   <li>TopAppBar with back button</li>
+ *   <li>Header text explaining the date range</li>
+ *   <li>Bar/Line toggle row</li>
+ *   <li>Chart container (Box) that renders either chart</li>
+ * </ol>
+ *
+ * @param navController NavController used for back navigation.
+ * @param viewModel PackageViewModel providing yearly aggregated order data.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

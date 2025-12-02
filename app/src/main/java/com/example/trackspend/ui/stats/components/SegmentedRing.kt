@@ -16,6 +16,24 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.cos
 import kotlin.math.sin
 
+
+/**
+ * Draws an animated multi-segment ring chart (circular bar chart)
+ * used in the analytics section to visualize order distribution per store.
+ *
+ * Features:
+ *  - Each store gets its own colored arc segment
+ *  - Segments animate in smoothly using `animateFloatAsState`
+ *  - Optional floating text labels drawn outside the ring
+ *  - Fully custom stroke width, size, and label color
+ *
+ * @param segments Map of store → count values
+ * @param total total number of orders (used for percentage calculation)
+ * @param modifier size of the canvas container
+ * @param strokeWidth thickness of the ring stroke
+ * @param showLabels whether to draw store names around the ring
+ * @param labelColor ARGB color for label text
+ */
 @Composable
 fun SegmentedRing(
     segments: Map<String, Int>,

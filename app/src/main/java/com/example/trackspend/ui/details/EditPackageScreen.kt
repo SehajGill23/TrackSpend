@@ -78,6 +78,17 @@ private val ErrorRed = Color(0xFFFF3B3B)
 // HELPER FUNCTIONS ⬇️ (THE FIX TO ALL YOUR ERRORS)
 // ------------------------------------------------------
 
+
+/**
+ * Converts raw user input into a normalized YYYY-MM-DD format.
+ *
+ * Behavior:
+ *  - Extracts only digits
+ *  - Auto-inserts hyphens while typing
+ *  - Handles partial dates safely
+ *
+ * Used by both Add and Edit screens to enforce consistent date input.
+ */
 private fun formatDate(raw: String): String {
     val digits = raw.filter { it.isDigit() }
     return when {
@@ -92,14 +103,37 @@ private fun formatDate(raw: String): String {
     }
 }
 
+
+/**
+ * Validates a YYYY-MM-DD date string.
+ *
+ * Checks:
+ *  - Exactly 10 characters
+ *  - Can be parsed as LocalDate
+ *
+ * @return true if format and value are valid
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 private fun isValidDate(f: String): Boolean =
     try { f.length == 10 && LocalDate.parse(f) != null }
     catch (_: Exception) { false }
 
-// ------------------------------------------------------
-// GLOW CARD
-// ------------------------------------------------------
+
+
+/**
+ * Reusable glow-style card used across the Edit screen.
+ *
+ * Features:
+ *  - Dynamic dark/light mode background
+ *  - Purple glow shadow
+ *  - Rounded corners and glass-like borders
+ *
+ * This keeps the Edit screen’s UI consistent with the app's aesthetic.
+ *
+ * @param modifier layout modifiers
+ * @param shape card corner shape
+ * @param content content to render inside the card
+ */
 @Composable
 private fun EditGlowCard(
     modifier: Modifier = Modifier,
@@ -142,9 +176,23 @@ private fun EditGlowCard(
     }
 }
 
-// ------------------------------------------------------
-// MAIN SCREEN
-// ------------------------------------------------------
+/**
+ * Full Edit Package screen.
+ *
+ * Responsibilities:
+ *  - Fetch package data from ViewModel using the provided ID
+ *  - Display editable fields (tracking #, carrier, store, name, price, date)
+ *  - Validate user input for errors
+ *  - Detect unsaved changes and show a "Discard Changes?" dialog
+ *  - Save updates back to the database
+ *
+ * Navigation:
+ *  - Back button triggers a warning dialog if there are unsaved changes
+ *
+ * @param id package ID from navigation
+ * @param viewModel shared PackageViewModel instance
+ * @param navController navigation controller for routing
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EditPackageScreen(

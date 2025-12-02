@@ -29,8 +29,6 @@ class PackageViewModel(context: Context) : ViewModel() {
     val allPackages = repo.getAllPackages()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    val totalSpent = repo.getTotalSpending()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0.0)
 
     fun addPackage(pkg: PackageEntity) {
         viewModelScope.launch {
@@ -57,13 +55,6 @@ class PackageViewModel(context: Context) : ViewModel() {
             repo.updatePinned(id, value)
         }
     }
-
-    val ordersByStore = allPackages.map { list ->
-        list
-            .mapNotNull { it.store?.takeIf { s -> s.isNotBlank() } }
-            .groupingBy { it }
-            .eachCount()
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
 
     // -------------------------------Monthly Parsing methods------------------------------------

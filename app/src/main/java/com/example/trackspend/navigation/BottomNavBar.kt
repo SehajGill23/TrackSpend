@@ -21,7 +21,18 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 /**
- * Bottom navigation bar that stays at the bottom of the screen.
+ * Renders the bottom navigation bar seen across all main screens.
+ *
+ * Responsibilities:
+ *  - Displays three main destinations (Home, Add, Analytics)
+ *  - Highlights the currently active route
+ *  - Applies dynamic theming for dark/light mode (colors, glow, icons)
+ *  - Handles navigation while preserving back stack rules
+ *
+ * The bar is visually elevated using a custom glow shadow and rounded
+ * corners to match the app’s overall modern glass-UI aesthetic.
+ *
+ * @param navController Used to navigate between the root screens.
  */
 @Composable
 fun BottomNavBar(navController: NavController) {

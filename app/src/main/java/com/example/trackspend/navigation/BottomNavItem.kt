@@ -8,7 +8,15 @@ import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
- * Represents each bottom navigation item.
+ * Defines the full set of items shown in the bottom navigation bar.
+ *
+ * This sealed class allows each destination to have:
+ *  - a unique route for navigation,
+ *  - a user-visible label,
+ *  - an icon for UI display.
+ *
+ * Using a sealed class ensures all nav items are strongly typed,
+ * discoverable at compile time, and prevents invalid items from being created.
  */
 sealed class BottomNavItem(
     val route: String,

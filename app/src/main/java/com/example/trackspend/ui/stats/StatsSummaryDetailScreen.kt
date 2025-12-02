@@ -40,6 +40,27 @@ import com.example.trackspend.ui.stats.components.SegmentedRing
 import com.example.trackspend.viewmodel.PackageViewModel
 
 
+/**
+ * A compact, reusable row used for displaying a labeled statistic in the
+ * summary screen. Shows an icon, a text label, and the value aligned to the
+ * right.
+ *
+ * <p><b>UI Structure:</b></p>
+ * <ul>
+ *   <li>Left section: icon + label</li>
+ *   <li>Right section: bold statistic value</li>
+ * </ul>
+ *
+ * <p><b>Used in:</b></p>
+ * <ul>
+ *   <li>{@link StatsSummaryDetailScreen} — to display total spending,
+ *       total orders, and number of stores.</li>
+ * </ul>
+ *
+ * @param icon  The leading icon representing the stat.
+ * @param label The descriptive label for the statistic (e.g., "Orders").
+ * @param value The formatted value to display on the right side.
+ */
 @Composable
 fun StatRow(
     icon: ImageVector,
@@ -80,6 +101,45 @@ fun StatRow(
     }
 }
 
+
+/**
+ * Full summary view for the user's monthly activity across spending,
+ * orders, and store distribution. This includes a large segmented ring
+ * chart, top-store insights, and compact statistics rows.
+ *
+ * <p><b>Features:</b></p>
+ * <ul>
+ *   <li><b>SegmentedRing chart:</b> Visualizes how orders are distributed
+ *       across different stores for the current month.</li>
+ *   <li><b>Dynamic theme-aware labels:</b> Ring labels automatically adjust
+ *       their brightness depending on dark/light mode.</li>
+ *   <li><b>Top Store Insight:</b> Displays the store with the highest number
+ *       of orders and its percentage contribution.</li>
+ *   <li><b>Monthly financial summary:</b> Shows total spending, total orders,
+ *       and number of unique stores used.</li>
+ *   <li><b>Back navigation:</b> Uses a TopAppBar with a back icon.</li>
+ * </ul>
+ *
+ * <p><b>Data sources (from PackageViewModel):</b></p>
+ * <ul>
+ *   <li>{@code monthlySpent}: total amount spent this month</li>
+ *   <li>{@code monthlyOrders}: number of orders this month</li>
+ *   <li>{@code monthlyOrdersByStore}: map of store → # of orders</li>
+ *   <li>{@code allPackages}: used to determine if any data exists</li>
+ * </ul>
+ *
+ * <p><b>UI Layout Overview:</b></p>
+ * <ol>
+ *   <li>TopAppBar with back arrow</li>
+ *   <li>Large center-aligned ring chart with spending overlay text</li>
+ *   <li>Top store name + percentage section</li>
+ *   <li>Divider separator</li>
+ *   <li>StatRow cards for the numerical metrics</li>
+ * </ol>
+ *
+ * @param navController Handles navigation back to the Stats screen.
+ * @param viewModel Provides all monthly and per-store data needed to build the summary.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +157,7 @@ fun StatsSummaryDetailScreen(
     val totalStores =  storeCounts.size
     val safeTotal = monthlySpent ?: 0.0
 
-// after safeTotal
+    // after safeTotal
     val topStoreEntry = storeCounts.maxByOrNull { it.value }
     val topName = topStoreEntry?.key ?: "Unknown"
 
@@ -197,7 +257,7 @@ fun StatsSummaryDetailScreen(
 
             Divider()
 
-// 🔥 Modern Stats Cards (compact + aesthetic)
+        //  Modern Stats Cards (compact + aesthetic)
             Column(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.fillMaxWidth()

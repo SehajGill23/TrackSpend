@@ -20,6 +20,20 @@ private val monthLabels = listOf(
     "JUL","AUG","SEP","OCT","NOV","DEC"
 )
 
+/**
+ * A fully custom 12-month line chart drawn using Canvas.
+ *
+ * Features:
+ *  - Smooth line path across JAN–DEC
+ *  - Gradient fill under the line
+ *  - Auto-scaled Y-axis with grid lines and labels
+ *  - Month labels along the X-axis
+ *  - Circular data points at each month
+ *
+ * @param data list of 12 Float values (monthly totals)
+ * @param maxY the maximum Y scale value for the chart
+ * @param modifier layout modifier for sizing or padding
+ */
 @Composable
 fun YearlyLineChart(
     data: List<Float>,

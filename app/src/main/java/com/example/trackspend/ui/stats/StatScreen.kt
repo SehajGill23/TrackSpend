@@ -51,9 +51,26 @@ private val LightPurple = Color(0xFFF0E6FC)
 private val BorderLight = Color.Black.copy(alpha = 0.10f)
 private val BorderDark = Color.White.copy(alpha = 0.12f)
 
-// ---------------------------------------------------------
-//  Universal Glow Card (matches AddPackage + Home UI)
-// ---------------------------------------------------------
+
+/**
+ * A reusable glowing card component used throughout the Stats screen.
+ *
+ * This composable wraps content inside a branded TrackSpend-style glow box,
+ * using a soft purple ambient shadow, rounded corners, theme-aware background
+ * colors, and a subtle glass-like border.
+ *
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Adaptive colors for dark and light mode</li>
+ *   <li>Purple glow shadow using custom ambient/spot colors</li>
+ *   <li>Rounded-corner shape with 20.dp radius</li>
+ *   <li>Border stroke to create a soft glass rim appearance</li>
+ *   <li>Fully flexible content slot for inner UI</li>
+ * </ul>
+ *
+ * @param modifier Optional modifier used to adjust layout, padding, or size.
+ * @param content Composable lambda defining the card's inner UI content.
+ */
 @Composable
 fun StatsGlowCard(
     modifier: Modifier = Modifier,
@@ -93,9 +110,40 @@ fun StatsGlowCard(
 }
 
 
-// ---------------------------------------------------------
-//   MAIN SCREEN
-// ---------------------------------------------------------
+/**
+ * Main Statistics Dashboard screen for the TrackSpend app.
+ *
+ * Displays the user's annual analytics including:
+ * total spending, total orders, monthly spending patterns, order distribution
+ * by store, and top-store percentage. Uses custom-built Canvas charts and glow
+ * cards to present data visually and interactively.
+ *
+ * <p>Key UI Elements:</p>
+ * <ul>
+ *   <li><b>Summary (Ring) Card</b> — Shows total spending, total orders, store count,
+ *       and top store share of monthly orders.</li>
+ *   <li><b>YearlyLineChart</b> — Visualizes monthly spending trends across the year.</li>
+ *   <li><b>YearlyBarChart</b> — Displays monthly order counts using animated bars.</li>
+ *   <li><b>SegmentedRing</b> — Circular distribution of orders by store.</li>
+ *   <li><b>Glow Cards</b> — Consistent branded container UI for charts.</li>
+ *   <li><b>Navigation</b> — Each chart card navigates to a more detailed analytics screen.</li>
+ * </ul>
+ *
+ * <p>State & Data:</p>
+ * Values are obtained from {@link PackageViewModel} using StateFlow:
+ * <ul>
+ *   <li>allPackages – raw list of packages</li>
+ *   <li>monthlySpent – aggregated monthly spending</li>
+ *   <li>monthlyOrders – number of orders per month</li>
+ *   <li>monthlyOrdersByStore – store-based order distribution map</li>
+ * </ul>
+ *
+ * <p>Theme Support:</p>
+ * Colors and glow effects adapt automatically to dark or light mode.
+ *
+ * @param viewModel The PackageViewModel providing aggregated analytics data.
+ * @param navController Used to navigate to Stats Summary, Spending, or Orders detail screens.
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StatsScreen(
