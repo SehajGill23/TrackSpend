@@ -65,6 +65,7 @@ import com.example.trackspend.R
 import com.example.trackspend.data.local.PackageEntity
 import com.example.trackspend.data.model.TrackingEvent
 import com.example.trackspend.ui.components.TrackingTimeline
+import com.example.trackspend.util.hasInternet
 import com.example.trackspend.viewmodel.PackageViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
@@ -152,10 +153,30 @@ fun PackageDetailScreen(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
+                        
+                        val hasNet = hasInternet(navController.context)
+
+                        if (!hasNet) {
+                            loading = false
+                            showTimeline = true
+
+                            events = listOf(
+                                TrackingEvent(
+                                    status = "No Internet Connection",
+                                    location = "Please reconnect to update tracking.",
+                                    timestamp = System.currentTimeMillis()
+                                )
+                            )
+
+                            return@Button
+                        }
+
+                        // Otherwise continue with refresh logic
                         loading = true
-                        showTimeline = false // hide timeline until loader finishes
+                        showTimeline = false
 
                         scope.launch {
+
                             // scroll to top immediately
                             lazyListState.animateScrollToItem(6)
 
@@ -173,15 +194,13 @@ fun PackageDetailScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Filled.LocalShipping,
-                            contentDescription = "Tracking Shipment",  // Always add accessibility descriptions
+                            contentDescription = "Tracking Shipment",
                             modifier = Modifier.size(18.dp)
                         )
-                        Spacer(modifier = Modifier.width(8.dp)) // Add space between
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text("Track Package")
                     }
-
                 }
-
             }
         }
 
