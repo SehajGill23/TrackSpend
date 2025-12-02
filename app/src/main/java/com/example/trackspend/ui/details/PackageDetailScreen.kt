@@ -24,9 +24,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -47,9 +52,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.trackspend.R
 import com.example.trackspend.data.local.PackageEntity
 import com.example.trackspend.data.model.TrackingEvent
 import com.example.trackspend.ui.components.TrackingTimeline
@@ -106,16 +116,15 @@ fun PackageDetailScreen(
                 horizontalArrangement = Arrangement.End
             ) {
                 IconButton(onClick = {
-                    // go to edit screen
                     navController.navigate("edit/${item.id}")
                 }) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit")
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Color(0xFF9B6DFF))
                 }
 
                 IconButton(onClick = {
                     showDeleteDialog = true
                 }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
                 }
             }
         }
@@ -238,23 +247,71 @@ fun PackageDetailScreen(
 
 @Composable
 fun MainInfoCard(pkg: PackageEntity) {
+    val Purple = Color(0xFF9B6DFF)
+    val DarkPurple = Color(0xFF140028)
+    val Border = Color.White.copy(alpha = 0.14f)
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 18.dp,
+                shape = RoundedCornerShape(16.dp),
+                ambientColor = Purple.copy(alpha = 0.9f),
+                spotColor = Purple.copy(alpha = 0.9f)
+            ),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        colors = CardDefaults.cardColors(containerColor = DarkPurple),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Border),
+        elevation = CardDefaults.cardElevation(0.dp)
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            DetailRow("Tracking Number", pkg.trackingNumber)
-            DetailRow("Carrier", pkg.carrier)
-            DetailRow("Item", pkg.itemName ?: "N/A")
-            DetailRow("Store", pkg.store ?: "N/A")
-            DetailRow("Price", pkg.price?.let { "$$it" } ?: "N/A")
-            DetailRow("Order Date", pkg.orderDate?.toString() ?: "N/A")
-            DetailRow("Status", pkg.status)
+            RowWithCustomIcon(R.drawable.barcode, "Tracking Number", pkg.trackingNumber)
+            RowWithIcon(Icons.Default.LocalShipping, "Carrier", pkg.carrier)
+            RowWithIcon(Icons.Default.ShoppingBag, "Item", pkg.itemName ?: "N/A")
+            RowWithIcon(Icons.Default.Store, "Store", pkg.store ?: "N/A")
+            RowWithIcon(Icons.Default.AttachMoney, "Price", pkg.price?.let { "$$it" } ?: "N/A")
+            RowWithIcon(Icons.Default.CalendarMonth, "Order Date", pkg.orderDate ?: "N/A")
+            RowWithIcon(Icons.Default.Info, "Status", pkg.status)
         }
+    }
+}
+
+@Composable
+fun RowWithIcon(icon: ImageVector, label: String, value: String) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, contentDescription = null, tint = Color(0xFF9B6DFF), modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(label, fontWeight = FontWeight.SemiBold, color = Color.White)
+        }
+        Text(value, color = Color.White)
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
+fun RowWithCustomIcon(
+    iconRes: Int,
+    label: String,
+    value: String
+) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painterResource(id = iconRes),
+                contentDescription = null,
+                tint = Color(0xFF9B6DFF),
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(label, fontWeight = FontWeight.SemiBold, color = Color.White)
+        }
+        Text(value, color = Color.White)
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 

@@ -2,6 +2,7 @@
 
 package com.example.trackspend.ui.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,7 +51,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -184,10 +187,13 @@ fun HomeScreen(
 
 @Composable
 fun TrackSpendTopBar() {
+    val PurpleBrand = Color(0xFF9B6DFF)
+
     TopAppBar(
         title = {
             Text(
                 "TrackSpend",
+                color = PurpleBrand,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -204,100 +210,142 @@ fun ModernPackageCard(
     onClick: () -> Unit,
     onLongPress: () -> Unit
 ) {
-    Card(
-        Modifier
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val PurpleBrand = Color(0xFF9B6DFF)
+    val DarkPurple = Color (0xFF110124)
+    val LightPurple = Color (0xFFF0E6FC)
+
+    // 💎 Outer glow shadow only
+    val shadowColor =
+        if (isDark) PurpleBrand.copy(alpha = 0.9f)
+        else PurpleBrand.copy(alpha = 0.7f)
+
+    // 💎 Border (glass rim)
+    val glassBorder =
+        if (isDark) Color.White.copy(alpha = 0.12f)
+        else Color.Black.copy(alpha = 0.10f)
+
+    // 💎 Transparent glass center
+    val glassFill =
+        if (isDark) DarkPurple  // barely visible tint
+        else LightPurple
+
+    // 🔥 Outer glow (no elevation)
+    Box(
+        modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongPress
-            ),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(3.dp)
+            .padding(2.dp)
+            .shadow(
+                elevation = 20.dp,
+                shape = RoundedCornerShape(22.dp),
+                ambientColor = shadowColor,
+                spotColor = shadowColor,
+                clip = false
+            )
     ) {
-        Column(
+        Card(
             modifier = Modifier
-                .padding(18.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .fillMaxWidth()
+                .combinedClickable(onClick = onClick, onLongClick = onLongPress),
+            shape = RoundedCornerShape(22.dp),
+
+            // 💎 The important part — fully transparent card center
+            colors = CardDefaults.cardColors(
+                containerColor = glassFill   // super subtle
+            ),
+
+            border = BorderStroke(1.dp, glassBorder),
+
+            // No Android shadow
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 0.dp
+            )
         ) {
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .padding(18.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Outlined.LocalShipping,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(22.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        pkg.carrier,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Outlined.LocalShipping,
+                            contentDescription = null,
+                            tint = PurpleBrand,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+
+                        Text(
+                            pkg.carrier,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    if (pkg.isPinned) {
+                        Icon(
+                            Icons.Filled.PushPin,
+                            contentDescription = null,
+                            tint = PurpleBrand.copy(alpha = 0.85f),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
 
-                if (pkg.isPinned) {
-                    Icon(
-                        Icons.Filled.PushPin,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-
-            Text(
-                pkg.itemName ?: "Unnamed item",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            Text(
-                pkg.trackingNumber,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Icon(
-                    Icons.Outlined.CalendarMonth,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
-                    modifier = Modifier.size(18.dp)
+                Text(
+                    pkg.itemName ?: "Unnamed item",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
 
                 Text(
-                    pkg.orderDate ?: "No date",
-                    style = MaterialTheme.typography.bodySmall,
+                    pkg.trackingNumber,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                Spacer(Modifier.weight(1f))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
 
-                Icon(
-                    Icons.Outlined.AttachMoney,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
-                    modifier = Modifier.size(18.dp)
-                )
+                    Icon(
+                        imageVector = Icons.Outlined.CalendarMonth,
+                        contentDescription = null,
+                        tint = PurpleBrand,
+                        modifier = Modifier.size(18.dp)
+                    )
 
-                Text(
-                    pkg.price?.let { "$${"%.2f".format(it)}" } ?: "--",
-                    style = MaterialTheme.typography.bodySmall
-                )
+                    Spacer(Modifier.width(6.dp))
+
+                    Text(
+                        pkg.orderDate ?: "No date",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Spacer(Modifier.weight(1f))
+
+                    Icon(
+                        imageVector = Icons.Outlined.AttachMoney,
+                        contentDescription = null,
+                        tint = PurpleBrand,
+                        modifier = Modifier.size(18.dp)
+                    )
+
+                    Text(
+                        pkg.price?.let { "$${"%.2f".format(it)}" } ?: "--",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         }
     }
@@ -351,25 +399,45 @@ fun SheetRow(icon: ImageVector, text: String, action: () -> Unit) {
  --------------------------------------------------------- */
 @Composable
 fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
-    TextField(
-        value = query,
-        onValueChange = onQueryChange,
-        placeholder = { Text("Search packages…") },
-        leadingIcon = {
-            Icon(Icons.Default.Search, contentDescription = null)
-        },
+    val PurpleBrand = Color(0xFF9B6DFF)
+    val EggplantDark = Color(0xFF150726)
+    val EggplantLight = Color(0xFFF2E8FF)
+
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val shadow = PurpleBrand.copy(alpha = if (isDark) 0.85f else 0.45f)
+    val fill = if (isDark) EggplantDark else EggplantLight
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp),
-        shape = RoundedCornerShape(18.dp),
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent
-        ),
-        singleLine = true
-    )
+            .shadow(
+                18.dp,
+                RoundedCornerShape(18.dp),
+                ambientColor = shadow,
+                spotColor = shadow,
+                clip = false
+            )
+    ) {
+        TextField(
+            value = query,
+            onValueChange = onQueryChange,
+            placeholder = { Text("Search packages…") },
+            leadingIcon = {
+                Icon(Icons.Default.Search, null, tint = PurpleBrand)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(18.dp),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = fill,
+                focusedContainerColor = fill,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            singleLine = true
+        )
+    }
 }
 
 @Composable
