@@ -1,3 +1,4 @@
+import jdk.tools.jlink.resources.plugins
 import java.util.Properties
 val props = Properties()
 file("${rootDir}/local.properties").inputStream().use { props.load(it) }
@@ -49,12 +50,10 @@ android {
         compose = true
     }
 
-    // ✅ ADD THIS
     kapt {
         correctErrorTypes = true
     }
 
-    // ✅ AND THIS
     testOptions {
         unitTests.isIncludeAndroidResources = false
     }
