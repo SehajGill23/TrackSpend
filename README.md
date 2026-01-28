@@ -44,7 +44,7 @@ It combines package tracking with personal expense insights, so you know **where
 
 | Home | Add Package | Package Details | Tracking | Stats |
 |-----|------------|----------------|---------|------|
-| ![Home](images/home.png) | ![Add](images/add.png) | ![Details](images/details.png) | ![EmailContent](images/email-content.png) | ![Tracking](images/tracking.png) | ![Stats](images/stats.png) | ![RadialCircle](images/radial-circle.png) |
+| ![Home](images/home.jpg) | ![Add](images/add.jpg) | ![Details](images/details.jpg) | ![EmailContent](images/email-content.jpg) | ![Tracking](images/tracking.jpg) | ![Stats](images/stats.jpg) | ![RadialCircle](images/radial-circle.jpg) |
 
 
 ---
@@ -53,7 +53,7 @@ It combines package tracking with personal expense insights, so you know **where
 
 You can install the app directly on an Android device:
 
-👉 **[Download Latest APK](https://github.com/USERNAME/REPO/releases/latest)**
+👉 **[Download Latest APK](https://github.com/Gillsehaj533/TrackSpend/releases/latest)**
 
 > ⚠️ Android will ask you to allow installs from unknown sources.
 
