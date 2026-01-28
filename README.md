@@ -44,7 +44,7 @@ It combines package tracking with personal expense insights, so you know **where
 
 | Home | Add Package | Package Details | Email Import |
 |------|-------------|------------------|--------------|
-| ![Home](images/home.jpg) | ![Add](images/add.jpg) | ![Details](images/details.jpg) | ![Email](images/email-content.jpg) |
+| ![Home](images/home.jpg) | ![Add](images/add.jpg) | ![Details](images/details.jpg) |
 
 | Tracking | Stats | Radial Chart |
 |----------|-------|--------------|
