@@ -42,9 +42,13 @@ It combines package tracking with personal expense insights, so you know **where
 
 ##  App Screenshots
 
-| Home | Add Package | Package Details | Tracking | Stats |
-|-----|------------|----------------|---------|------|
-| ![Home](images/home.jpg) | ![Add](images/add.jpg) | ![Details](images/details.jpg) | ![EmailContent](images/email-content.jpg) | ![Tracking](images/tracking.jpg) | ![Stats](images/stats.jpg) | ![RadialCircle](images/radial-circle.jpg) |
+| Home | Add Package | Package Details | Email Import |
+|------|-------------|------------------|--------------|
+| ![Home](images/home.jpg) | ![Add](images/add.jpg) | ![Details](images/details.jpg) | ![Email](images/email-content.jpg) |
+
+| Tracking | Stats | Radial Chart |
+|----------|-------|--------------|
+| ![Tracking](images/tracking.jpg) | ![Stats](images/stats.jpg) | ![Radial](images/radial-circle.jpg) |
 
 
 ---
