@@ -42,8 +42,8 @@ It combines package tracking with personal expense insights, so you know **where
 
 ##  App Screenshots
 
-| Home | Add Package | Package Details | Email Import |
-|------|-------------|------------------|--------------|
+| Home | Add Package | Package Details |
+|------|-------------|------------------|
 | ![Home](images/home.jpg) | ![Add](images/add.jpg) | ![Details](images/details.jpg) |
 
 | Tracking | Stats | Radial Chart |
