@@ -1,5 +1,6 @@
 # TrackSpend
-(images/TrackSpend.jpg)
+---
+![TrackSpend] (images/TrackSpend.jpg)
 **TrackSpend** is an Android app that helps you **track your packages and monitor your spending** in one place.  
 It combines package tracking with personal expense insights, so you know **where your orders are** and **how much you’re spending** every month.
 
